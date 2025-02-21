@@ -4,8 +4,8 @@ import (
   "log"
 
   "github.com/gofiber/fiber/v2"
-  //"github.com/your_username/ecommerce-api/config"
-  //"github.com/your_username/ecommerce-api/routes"
+  "github.com/kamilkulczyk/Ecommerce-Api/config"
+  "github.com/kamilkulczyk/Ecommerce-Api/routes"
 )
 
 func main() {
