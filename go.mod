@@ -1,15 +1,17 @@
-module ecommerce-api
+module github.com/kamilkulczyk/Ecommerce-Api
 
 go 1.22.3
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/jwt/v3 v3.3.10
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/joho/godotenv v1.5.1
 )
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
