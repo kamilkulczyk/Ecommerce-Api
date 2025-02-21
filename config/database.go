@@ -1,4 +1,4 @@
-package config
+package database
 
 import (
   "context"
@@ -7,19 +7,11 @@ import (
   "os"
 
   "github.com/jackc/pgx/v5"
-  "github.com/joho/godotenv"
 )
 
-var DB *pgx.Conn
+var db *pgx.Conn
 
 func ConnectDB() {
-  // Load environment variables
-  err := godotenv.Load()
-  if err != nil {
-    log.Fatal("Error loading .env file")
-  }
-
-  // Build connection string
   connStr := fmt.Sprintf(
     "user=%s password=%s host=%s port=%s dbname=%s sslmode=require",
     os.Getenv("DB_USER"),
@@ -29,11 +21,15 @@ func ConnectDB() {
     os.Getenv("DB_NAME"),
   )
 
-  // Connect to the database
-  DB, err = pgx.Connect(context.Background(), connStr)
+  var err error
+  db, err = pgx.Connect(context.Background(), connStr)
   if err != nil {
-    log.Fatalf("Failed to connect to the database: %v", err)
+    log.Fatalf("Failed to connect to database: %v", err)
   }
 
-  log.Println("Connected to database")
+  log.Println("✅ Connected to database")
+}
+
+func GetDB() *pgx.Conn {
+  return db
 }
