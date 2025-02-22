@@ -3,21 +3,26 @@ import { useEffect, useState } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const updateUser = () => {
+      const storedUser = localStorage.getItem("user");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
 
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    window.addEventListener("storage", updateUser);
+    return () => window.removeEventListener("storage", updateUser);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    window.dispatchEvent(new Event("storage")); // Notify other components
   };
 
   return (
@@ -29,7 +34,9 @@ const Navbar = () => {
         <Link to="/products">Products</Link>
         {user ? (
           <>
-            <span className="username">Hello, {user.username}!</span>
+            <Link to="/profile" className="user-button">
+              Hello, {user.username}!
+            </Link>
             <button onClick={handleLogout} className="button">Logout</button>
           </>
         ) : (
