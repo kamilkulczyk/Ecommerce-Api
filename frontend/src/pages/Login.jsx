@@ -6,10 +6,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password });
-    // Add API call logic here
+    try {
+      await axios.post(import.meta.env.VITE_API_URL + "/login", { username, email, password });
+      alert("Logged in successful!");
+      navigate("/products");
+    } catch (error) {
+      alert("Registration failed");
+    }
   };
 
   return (
