@@ -4,6 +4,7 @@ import (
   "log"
 
   "github.com/gofiber/fiber/v2"
+  "github.com/gofiber/fiber/v2/middleware/cors"
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/routes"
 )
@@ -14,6 +15,13 @@ func main() {
 
   // Initialize Fiber app
   app := fiber.New()
+
+  // Enable CORS
+  app.Use(cors.New(cors.Config{
+    AllowOrigins: "https://ecommerce-kulczyk.netlify.app", // Your frontend URL
+    AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+    AllowHeaders: "Content-Type, Authorization",
+  }))
 
   // Setup routes
   routes.SetupRoutes(app)
