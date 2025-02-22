@@ -9,11 +9,12 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(import.meta.env.VITE_API_URL + "/login", { username, email, password });
-      alert("Logged in successful!");
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { email, password });
+      localStorage.setItem("token", res.data.token);
+      alert("Login successful!");
       navigate("/products");
     } catch (error) {
-      alert("Registration failed");
+      alert("Login failed");
     }
   };
 
