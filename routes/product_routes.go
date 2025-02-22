@@ -8,6 +8,6 @@ import (
 
 // ProductRoutes handles product-related endpoints
 func ProductRoutes(app *fiber.App) {
-	api.Get("/products", handlers.GetProducts)
-	api.Post("/products",  middlewares.JWTMiddleware(), handlers.CreateProduct)
+	app.Get("/products", handlers.GetProducts)
+	app.Post("/products",  middlewares.JWTMiddleware(), handlers.CreateProduct)
 }
