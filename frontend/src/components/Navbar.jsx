@@ -1,33 +1,17 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { UserCircle } from "lucide-react";
+import { AuthContext } from "../context/AuthContext"; // ✅ Import context
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [user, setUser] = useState(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
-  });
+  const { user, logout } = useContext(AuthContext); // ✅ Use AuthContext
+  const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const updateUser = () => {
-      const storedUser = localStorage.getItem("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
-
-    window.addEventListener("storage", updateUser);
-    return () => window.removeEventListener("storage", updateUser);
-  }, []);
-
+  const toggleDropdown = () => setIsOpen(!isOpen);
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    window.dispatchEvent(new Event("storage")); // Notify other components
+    logout();
+    setIsOpen(false); // Close dropdown on logout
   };
 
   return (
@@ -37,17 +21,19 @@ const Navbar = () => {
       </h1>
       <div className="nav-items">
         <Link to="/products">Products</Link>
-        
+
         {user ? (
           <div className="dropdown">
-            <button className="user-button">
+            <button className="user-button" onClick={toggleDropdown}>
               <UserCircle size={20} className="icon" />
               {user.username}
             </button>
-            <div className="dropdown-content">
-              <Link to="/profile">User Page</Link>
-              <button onClick={handleLogout}>Logout</button>
-            </div>
+            {isOpen && (
+              <div className="dropdown-content">
+                <Link to="/profile" onClick={() => setIsOpen(false)}>User Page</Link>
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
           </div>
         ) : (
           <Link to="/login" className="button">Login</Link>

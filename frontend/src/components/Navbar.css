@@ -55,57 +55,52 @@
     background-color: #e60000;
   }
 
+  .user-menu {
+    position: relative;
+  }
+  
   .user-button {
-    background-color: #f3f4f6; /* Gray */
-    color: #333;
-    border-radius: 8px;
+    background: #ddd;
+    color: black;
     padding: 8px 12px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
+    gap: 8px;
     cursor: pointer;
     border: none;
   }
   
   .user-button:hover {
-    background-color: #e5e7eb;
+    background: #bbb;
   }
   
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropdown-content {
-    display: none;
+  .dropdown-menu {
     position: absolute;
-    background-color: white;
-    min-width: 120px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
-    padding: 8px 0;
+    top: 100%;
     right: 0;
-    z-index: 1000;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 140px;
+    z-index: 10;
   }
   
-  .dropdown-content a,
-  .dropdown-content button {
-    display: block;
-    padding: 8px 16px;
-    text-align: left;
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    color: black;
+    text-decoration: none;
     width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
   }
   
-  .dropdown-content a:hover,
-  .dropdown-content button:hover {
-    background-color: #f3f4f6;
+  .dropdown-item:hover {
+    background: #f0f0f0;
   }
   
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
   
   .icon {
     margin-right: 6px;
