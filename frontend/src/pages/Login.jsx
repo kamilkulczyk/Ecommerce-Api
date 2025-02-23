@@ -7,18 +7,29 @@ import axios from "axios";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // Disable button during request
+
     try {
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { email, password });
-      login(res.data.user, res.data.token); // ✅ Update global user state
-      alert("Login successful!");
-      navigate("/products");
+
+      if (res.data?.user && res.data?.token) {
+        login(res.data.user, res.data.token);
+        alert("Login successful!");
+        navigate("/products");
+      } else {
+        throw new Error("Invalid response from server.");
+      }
     } catch (error) {
-      alert("Login failed");
+      console.error("Login error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Login failed, please try again.");
+    } finally {
+      setLoading(false); // Re-enable button
     }
   };
 
@@ -40,7 +51,9 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
       <p>Don't have an account?</p>
       <Link to="/register" className="register-button">

@@ -3,10 +3,15 @@ import { useEffect, useState } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+    const [user, setUser] = useState(() => {
+        try {
+          const storedUser = localStorage.getItem("user");
+          return storedUser ? JSON.parse(storedUser) : null;
+        } catch {
+          return null;
+        }
+      });
+      
 
   useEffect(() => {
     const updateUser = () => {
