@@ -1,41 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { UserCircle } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [user, setUser] = useState(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
-  });
-
+  const { user, logout } = useContext(AuthContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const updateUser = () => {
-      const storedUser = localStorage.getItem("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
-
-    window.addEventListener("storage", updateUser);
-    return () => window.removeEventListener("storage", updateUser);
-  }, []);
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+    logout();
     setIsDropdownOpen(false);
-    window.dispatchEvent(new Event("storage"));
-
-    // Redirect user to homepage after logout
-    navigate("/");
+    navigate("/"); // Redirect to homepage after logout
   };
 
   useEffect(() => {
@@ -49,6 +31,8 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {}, [user]);
+
   return (
     <nav className="navbar">
       <h1 className="logo">
@@ -59,14 +43,15 @@ const Navbar = () => {
 
         {user ? (
           <div className="user-menu" ref={dropdownRef}>
-            <button className="user-button" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+            <button className="user-button" onClick={toggleDropdown}>
               <UserCircle size={20} className="icon" />
               {user.username}
             </button>
+
             {isDropdownOpen && (
               <div className="dropdown-menu">
                 <Link to="/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>User Page</Link>
-                <button onClick={handleLogout} className="logout-button">Logout</button>
+                <button className="logout-button" onClick={handleLogout}>Logout</button>
               </div>
             )}
           </div>
