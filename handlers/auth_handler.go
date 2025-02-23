@@ -70,7 +70,8 @@ func Login(c *fiber.Ctx) error {
 
   // Get user from database
   err := conn.QueryRow(context.Background(),
-    "SELECT id, password FROM users WHERE email=$1", user.Email).Scan(&user.ID, &storedPassword)
+    "SELECT id, username, email, password FROM users WHERE email=$1", user.Email).
+    Scan(&user.ID, &user.Username, &user.Email, &storedPassword)
 
   if err != nil {
     return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
@@ -92,5 +93,13 @@ func Login(c *fiber.Ctx) error {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
   }
 
-  return c.JSON(fiber.Map{"token": tokenString})
+  // ✅ Return both token and user data
+  return c.JSON(fiber.Map{
+    "token": tokenString,
+    "user": fiber.Map{
+      "id":       user.ID,
+      "username": user.Username,
+      "email":    user.Email,
+    },
+  })
 }
