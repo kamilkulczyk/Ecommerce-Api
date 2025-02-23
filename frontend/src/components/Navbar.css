@@ -40,16 +40,6 @@
   .button:hover {
     background: #0056b3;
   }
-
-  .user-button {
-    background-color: transparent;
-    border: none;
-    font-size: 16px;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    padding: 5px 10px;
-  }
   
   .logout-button {
     background-color: #ff4d4d;
@@ -64,5 +54,62 @@
   .logout-button:hover {
     background-color: #e60000;
   }
+
+  .user-button {
+    background-color: #f3f4f6; /* Gray */
+    color: #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .user-button:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 120px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 8px 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .dropdown-content a,
+  .dropdown-content button {
+    display: block;
+    padding: 8px 16px;
+    text-align: left;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown-content a:hover,
+  .dropdown-content button:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  
+  .icon {
+    margin-right: 6px;
+  }
+  
   
   

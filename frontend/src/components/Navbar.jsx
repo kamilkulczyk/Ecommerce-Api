@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { UserCircle } from "lucide-react";
 import "./Navbar.css";
 
 const Navbar = () => {
-    const [user, setUser] = useState(() => {
-        try {
-          const storedUser = localStorage.getItem("user");
-          return storedUser ? JSON.parse(storedUser) : null;
-        } catch {
-          return null;
-        }
-      });
-      
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const updateUser = () => {
@@ -37,13 +37,18 @@ const Navbar = () => {
       </h1>
       <div className="nav-items">
         <Link to="/products">Products</Link>
+        
         {user ? (
-          <>
-            <Link to="/profile" className="user-button">
-              Hello, {user.username}!
-            </Link>
-            <button onClick={handleLogout} className="button">Logout</button>
-          </>
+          <div className="dropdown">
+            <button className="user-button">
+              <UserCircle size={20} className="icon" />
+              {user.username}
+            </button>
+            <div className="dropdown-content">
+              <Link to="/profile">User Page</Link>
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          </div>
         ) : (
           <Link to="/login" className="button">Login</Link>
         )}
