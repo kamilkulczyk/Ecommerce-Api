@@ -1,17 +1,20 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { UserCircle } from "lucide-react";
-import { AuthContext } from "../context/AuthContext"; // ✅ Import context
+import { AuthContext } from "../context/AuthContext";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext); // ✅ Use AuthContext
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   const handleLogout = () => {
     logout();
-    setIsOpen(false); // Close dropdown on logout
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -23,15 +26,16 @@ const Navbar = () => {
         <Link to="/products">Products</Link>
 
         {user ? (
-          <div className="dropdown">
+          <div className="user-menu">
             <button className="user-button" onClick={toggleDropdown}>
               <UserCircle size={20} className="icon" />
               {user.username}
             </button>
-            {isOpen && (
-              <div className="dropdown-content">
-                <Link to="/profile" onClick={() => setIsOpen(false)}>User Page</Link>
-                <button onClick={handleLogout}>Logout</button>
+
+            {isDropdownOpen && (
+              <div className="dropdown-menu">
+                <Link to="/profile" className="dropdown-item">User Page</Link>
+                <button className="logout-button" onClick={handleLogout}>Logout</button>
               </div>
             )}
           </div>

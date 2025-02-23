@@ -57,9 +57,9 @@
 
   .user-menu {
     position: relative;
-  }
-  
-  .user-button {
+}
+
+.user-button {
     background: #ddd;
     color: black;
     padding: 8px 12px;
@@ -69,38 +69,55 @@
     gap: 8px;
     cursor: pointer;
     border: none;
-  }
-  
-  .user-button:hover {
+    transition: background 0.3s;
+}
+
+.user-button:hover {
     background: #bbb;
-  }
-  
-  .dropdown-menu {
+}
+
+.dropdown-menu {
     position: absolute;
     top: 100%;
     right: 0;
     background: white;
     border-radius: 6px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     width: 140px;
     z-index: 10;
-  }
-  
-  .dropdown-item {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 0;
+    opacity: 1; /* Ensure visibility */
+}
+
+.dropdown-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px;
+    padding: 10px 15px;
     color: black;
     text-decoration: none;
     width: 100%;
-  }
-  
-  .dropdown-item:hover {
-    background: #f0f0f0;
-  }
-  
+    font-size: 16px;
+}
+
+.dropdown-item:hover {
+    background: #e0e0e0;
+}
+
+.logout-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #e60000;
+}
   
   .icon {
     margin-right: 6px;
