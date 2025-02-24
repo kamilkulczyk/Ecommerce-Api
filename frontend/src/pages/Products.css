@@ -1,0 +1,27 @@
+.products-container {
+    text-align: center;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  input {
+    width: 50px;
+    margin: 0 10px;
+    text-align: center;
+  }
+  
+  button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
