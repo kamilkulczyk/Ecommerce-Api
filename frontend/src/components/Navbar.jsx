@@ -1,11 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext, useRef } from "react";
-import { UserCircle } from "lucide-react";
+import { UserCircle, ShoppingCart } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import { CartContext } from "../context/CartContext"; // Import CartContext
 import "./Navbar.css";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const { cart } = useContext(CartContext); // Get cart from context
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -31,8 +33,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {}, [user]);
-
   return (
     <nav className="navbar">
       <h1 className="logo">
@@ -40,6 +40,11 @@ const Navbar = () => {
       </h1>
       <div className="nav-items">
         <Link to="/products">Products</Link>
+
+        <button className="cart-button" onClick={() => navigate("/cart")}>
+          <ShoppingCart size={20} className="icon" />
+          {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
+        </button>
 
         {user ? (
           <div className="user-menu" ref={dropdownRef}>
