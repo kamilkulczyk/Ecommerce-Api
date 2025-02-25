@@ -28,11 +28,11 @@ form {
     margin: 0 auto; /* Center the form */
   }
   
-  input, button {
+  /* input, button {
     padding: 10px;
     font-size: 16px;
     width: 100%;
-    box-sizing: border-box; /* Prevents overflow */
+    box-sizing: border-box;
   }
   
   button {
@@ -45,7 +45,7 @@ form {
   
   button:hover {
     background-color: #0056b3;
-  }
+  } */
   
   
   /* Product Grid */

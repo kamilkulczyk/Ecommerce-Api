@@ -6,6 +6,8 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import { CartProvider } from "./context/CartContext";
+import AddProduct from "./pages/AddProduct";
+import FloatingAddButton from "./components/FloatingAddButton";
 
 const App = () => {
   return (
@@ -19,7 +21,9 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/add-product" element={<AddProduct />} />
         </Routes>
+        <FloatingAddButton />
       </Router>
     </CartProvider>
   );

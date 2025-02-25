@@ -1,51 +1,71 @@
-import { useCart } from "../context/CartContext";
+import { CartContext } from "../context/CartContext";
+import { useContext } from "react";
+import { FaTrash } from "react-icons/fa"; // Import trash icon
 import "./Cart.css";
 
 const Cart = () => {
-  const { cart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart } = useContext(CartContext);
+
+  const calculateTotal = () => {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  };
 
   return (
-    <div className="page-container">
-      <h2>Your Cart</h2>
-
+    <div className="cart-container">
+      <h2 className="cart-title">Your Cart</h2>
       {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="empty-cart">Your cart is empty.</p>
       ) : (
-        <>
-          <div className="cart-items">
-            {cart.map((item) => (
-              <div key={item.id} className="cart-item">
-                <p>
-                  <strong>{item.name}</strong> - ${item.price} x {item.quantity}
-                </p>
-
-                <button
-                  onClick={() => decreaseQuantity(item.id)}
-                  disabled={item.quantity === 1}
-                >
-                  -
-                </button>
-
-                <button
-                  onClick={() => increaseQuantity(item.id)}
-                  disabled={item.quantity >= item.stock}
-                >
-                  +
-                </button>
-
-                <button onClick={() => removeFromCart(item.id)}>Remove</button>
+        <div className="cart-items">
+          {cart.map((item) => (
+            <div key={item.id} className="cart-item">
+              {/* Left: Product Image & Details */}
+              <div className="cart-item-left">
+                {item.image && <img src={item.image} alt={item.name} className="cart-item-image" />}
+                <div className="cart-item-details">
+                  <h3 className="cart-item-name">{item.name}</h3>
+                </div>
               </div>
-            ))}
+
+              {/* Right: Price, Quantity, and Remove */}
+              <div className="cart-item-right">
+                <p className="cart-item-price">{item.price.toFixed(2)} zł</p>
+
+                <div className="cart-controls">
+                  <button
+                    className="quantity-btn"
+                    disabled={item.quantity <= 1}
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                  >
+                    −
+                  </button>
+                  <input type="text" value={item.quantity} readOnly className="quantity-input" />
+                  <button
+                    className="quantity-btn"
+                    disabled={item.quantity >= item.stock}
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <p className="cart-item-total">{(item.price * item.quantity).toFixed(2)} zł</p>
+
+                <button className="remove-button" onClick={() => removeFromCart(item.id)}>
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Cart Total */}
+          <div className="cart-total">
+            <strong>Total: {calculateTotal()} zł</strong>
           </div>
 
-          <h3 className="total-price">
-            Total: ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
-          </h3>
-
-          <button className="clear-cart" onClick={clearCart} disabled={cart.length === 0}>
-            Clear Cart
-          </button>
-        </>
+          {/* Clear Cart Button */}
+          <button className="clear-cart-btn" onClick={clearCart}>Clear Cart</button>
+        </div>
       )}
     </div>
   );
