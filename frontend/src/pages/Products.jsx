@@ -1,39 +1,24 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { CartContext } from "../context/CartContext";
+import { useCart } from "../context/CartContext";
 import "../styles.css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const { addToCart } = useContext(CartContext);
+  const { cart, addToCart } = useCart();
   const [quantities, setQuantities] = useState({});
-  const [stock, setStock] = useState({});
 
   useEffect(() => {
     axios
       .get(import.meta.env.VITE_API_URL + "/products")
-      .then((res) => {
-        setProducts(res.data);
-        const initialStock = res.data.reduce((acc, product) => {
-          acc[product.id] = product.stock;
-          return acc;
-        }, {});
-        setStock(initialStock);
-      })
+      .then((res) => setProducts(res.data))
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
 
-  const handleAddToCart = (product) => {
-    const quantity = quantities[product.id] || 1; // Default to 1 if not set
-    if (product.stock >= quantity) {
-      addToCart({ ...product, quantity });
-
-      setStock((prevStock) => ({
-        ...prevStock,
-        [product.id]: prevStock[product.id] - quantity,
-      }));
-    } else {
-      alert("Not enough stock available!");
+  const handleQuantityChange = (productId, value) => {
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue) && parsedValue >= 1) {
+      setQuantities((prev) => ({ ...prev, [productId]: parsedValue }));
     }
   };
 
@@ -41,29 +26,33 @@ const Products = () => {
     <div className="page-container">
       <h2>Products</h2>
       <div className="products-container">
-        {products.map((product) => (
-          <div key={product.id} className="product-card">
-            <h3>{product.name}</h3>
-            <p>💰 ${product.price}</p>
-            <p>📦 In Stock: {product.stock}</p>
-            <input
-              type="number"
-              min="1"
-              max={product.stock}
-              value={quantities[product.id] || 1}
-              onChange={(e) =>
-                setQuantities({ ...quantities, [product.id]: parseInt(e.target.value) })
-              }
-              disabled={stock[product.id] === 0}
-            />
-            <button 
-                onClick={() => handleAddToCart(product)}
-                disabled={stock[product.id] === 0}
-            >
-                {stock[product.id] > 0 ? "Add to Cart" : "Out of Stock"}
-            </button>
-          </div>
-        ))}
+        {products.map((product) => {
+          const cartItem = cart.find((item) => item.id === product.id);
+          const maxAvailable = product.stock - (cartItem ? cartItem.quantity : 0);
+
+          return (
+            <div key={product.id} className="product-card">
+              <h3>{product.name}</h3>
+              <p>💰 ${product.price}</p>
+              <p>📦 In Stock: {product.stock}</p>
+
+              <input
+                type="number"
+                value={quantities[product.id] || 1}
+                min="1"
+                max={maxAvailable}
+                onChange={(e) => handleQuantityChange(product.id, e.target.value)}
+              />
+
+              <button
+                onClick={() => addToCart(product, quantities[product.id] || 1)}
+                disabled={maxAvailable === 0}
+              >
+                Add to Cart
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

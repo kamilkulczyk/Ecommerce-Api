@@ -1,39 +1,57 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  // Load cart from localStorage when component mounts
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
       if (existingItem) {
+        // Ensure we don't exceed stock limit
+        const newQuantity = existingItem.quantity + quantity;
+        if (newQuantity > product.stock) return prevCart;
         return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + product.quantity } : item
+          item.id === product.id ? { ...item, quantity: newQuantity } : item
         );
+      } else {
+        return [...prevCart, { ...product, quantity }];
       }
-      return [...prevCart, product];
     });
   };
 
-  const updateCartQuantity = (id, quantity) => {
+  const increaseQuantity = (productId) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.id === productId && item.quantity < item.stock
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       )
     );
   };
 
-  const removeFromCart = (id) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+  const decreaseQuantity = (productId) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === productId && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+    );
+  };
+
+  const removeFromCart = (productId) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
   };
 
   const clearCart = () => {
@@ -41,8 +59,12 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateCartQuantity, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
+
+export const useCart = () => useContext(CartContext);
