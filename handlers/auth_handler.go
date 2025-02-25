@@ -58,48 +58,55 @@ func Register(c *fiber.Ctx) error {
 }
 
 // ✅ Login user and return JWT token
+// Login handler
 func Login(c *fiber.Ctx) error {
-  conn := config.GetDB()
+    var req struct {
+        Email    string `json:"email"`
+        Password string `json:"password"`
+    }
 
-  var user models.User
-  var storedPassword string
+    if err := c.BodyParser(&req); err != nil {
+        return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+    }
 
-  if err := c.BodyParser(&user); err != nil {
-    return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
-  }
+    var userID int
+    var hashedPassword string
+    var username string
+    var isAdmin bool
 
-  // Get user from database
-  err := conn.QueryRow(context.Background(),
-    "SELECT id, username, email, password FROM users WHERE email=$1", user.Email).
-    Scan(&user.ID, &user.Username, &user.Email, &storedPassword)
+    // Fetch user from DB
+    err := config.GetDB().QueryRow(context.Background(),
+        "SELECT id, username, password, is_admin FROM users WHERE email = $1", req.Email).
+        Scan(&userID, &username, &hashedPassword, &isAdmin)
 
-  if err != nil {
-    return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
-  }
+    if err != nil {
+        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+    }
 
-  // Compare stored hashed password with entered password
-  if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(user.Password)); err != nil {
-    return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
-  }
+    // Compare hashed passwords (assuming you hash passwords)
+    if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password)); err != nil {
+        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+    }
 
-  // Generate JWT token
-  token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-    "user_id": user.ID,
-    "exp":     time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
-  })
-  tokenString, err := token.SignedString([]byte(secretKey))
+    // Create JWT token
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "user_id": userID,
+        "is_admin": isAdmin, // Include admin status in token
+        "exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24h
+    })
 
-  if err != nil {
-    return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
-  }
+    tokenString, err := token.SignedString([]byte(secretKey))
+    if err != nil {
+        return c.Status(500).JSON(fiber.Map{"error": "Could not generate token"})
+    }
 
-  // ✅ Return both token and user data
-  return c.JSON(fiber.Map{
-    "token": tokenString,
-    "user": fiber.Map{
-      "id":       user.ID,
-      "username": user.Username,
-      "email":    user.Email,
-    },
-  })
+    return c.JSON(fiber.Map{
+        "token": tokenString,
+        "user": fiber.Map{
+            "id":       userID,
+            "email":    req.Email,
+            "username": username,
+            "is_admin": isAdmin,
+        },
+    })
 }

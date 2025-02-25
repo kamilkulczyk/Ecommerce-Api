@@ -13,6 +13,7 @@ func GetProducts(c *fiber.Ctx) error {
 		statusFilter := 2 // Default: Only show approved products
 
 		// If admin, allow fetching all statuses
+		isAdmin := c.Locals("is_admin").(bool)
 		if isAdmin(c) { 
 				statusFilter = c.QueryInt("status_id", 2)
 		}

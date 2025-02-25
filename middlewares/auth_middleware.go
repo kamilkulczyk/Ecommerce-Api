@@ -23,6 +23,16 @@ func JWTMiddleware() fiber.Handler {
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
 
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
+		}
+
+		// Store user ID and admin status in Fiber context
+		c.Locals("user_id", int(claims["user_id"].(float64)))
+		c.Locals("is_admin", claims["is_admin"].(bool)) 
+
 		return c.Next()
 	}
 }
+
