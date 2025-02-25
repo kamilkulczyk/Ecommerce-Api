@@ -7,11 +7,19 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const { addToCart } = useContext(CartContext);
   const [quantities, setQuantities] = useState({});
+  const [stock, setStock] = useState({});
 
   useEffect(() => {
     axios
       .get(import.meta.env.VITE_API_URL + "/products")
-      .then((res) => setProducts(res.data))
+      .then((res) => {
+        setProducts(res.data);
+        const initialStock = res.data.reduce((acc, product) => {
+          acc[product.id] = product.stock;
+          return acc;
+        }, {});
+        setStock(initialStock);
+      })
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
 
@@ -19,6 +27,11 @@ const Products = () => {
     const quantity = quantities[product.id] || 1; // Default to 1 if not set
     if (product.stock >= quantity) {
       addToCart({ ...product, quantity });
+
+      setStock((prevStock) => ({
+        ...prevStock,
+        [product.id]: prevStock[product.id] - quantity,
+      }));
     } else {
       alert("Not enough stock available!");
     }
@@ -41,8 +54,14 @@ const Products = () => {
               onChange={(e) =>
                 setQuantities({ ...quantities, [product.id]: parseInt(e.target.value) })
               }
+              disabled={stock[product.id] === 0}
             />
-            <button onClick={() => handleAddToCart(product)}>Add to Cart</button>
+            <button 
+                onClick={() => handleAddToCart(product)}
+                disabled={stock[product.id] === 0}
+            >
+                {stock[product.id] > 0 ? "Add to Cart" : "Out of Stock"}
+            </button>
           </div>
         ))}
       </div>
