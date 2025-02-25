@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   
 
   const login = (userData, token) => {
+    console.log("Received token:", token); // Debugging log
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("token", token);
     setUser(userData);
