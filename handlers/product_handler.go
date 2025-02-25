@@ -10,25 +10,34 @@ import (
 )
 
 func GetProducts(c *fiber.Ctx) error {
-	rows, err := config.GetDB().Query(context.Background(), "SELECT id, name, price, stock FROM products")
-	if err != nil {
-		log.Println(err)
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch products"})
-	}
-	defer rows.Close()
+		statusFilter := 2 // Default: Only show approved products
 
-	var products []models.Product
-	for rows.Next() {
-		var product models.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock); err != nil {
-			log.Println(err)
-			return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
+		// If admin, allow fetching all statuses
+		if isAdmin(c) { 
+				statusFilter = c.QueryInt("status_id", 2)
 		}
-		products = append(products, product)
-	}
 
-	return c.JSON(products)
+		rows, err := config.GetDB().Query(context.Background(),
+				"SELECT id, name, price, stock, status_id FROM products WHERE status_id = $1", statusFilter)
+
+		if err != nil {
+				log.Println(err)
+				return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch products"})
+		}
+		defer rows.Close()
+
+		var products []models.Product
+		for rows.Next() {
+				var product models.Product
+				if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID); err != nil {
+						return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
+				}
+				products = append(products, product)
+		}
+
+		return c.JSON(products)
 }
+
 
 func CreateProduct(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(int)
@@ -76,4 +85,42 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"message": "Product created successfully", "product_id": productID})
+}
+
+func UpdateProductStatus(c *fiber.Ctx) error {
+		id := c.Params("id")
+		var body struct { StatusID int `json:"status_id"` }
+
+		if err := c.BodyParser(&body); err != nil {
+				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+		}
+
+		_, err := config.GetDB().Exec(context.Background(),
+				"UPDATE products SET status_id=$1 WHERE id=$2", body.StatusID, id)
+
+		if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "Failed to update status"})
+		}
+
+		return c.JSON(fiber.Map{"message": "Product status updated successfully"})
+}
+
+func GetProductStatuses(c *fiber.Ctx) error {
+		rows, err := config.GetDB().Query(context.Background(), "SELECT id, status FROM product_statuses")
+
+		if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch statuses"})
+		}
+		defer rows.Close()
+
+		var statuses []models.ProductStatus
+		for rows.Next() {
+				var status models.ProductStatus
+				if err := rows.Scan(&status.ID, &status.Status); err != nil {
+						return c.Status(500).JSON(fiber.Map{"error": "Failed to scan status"})
+				}
+				statuses = append(statuses, status)
+		}
+
+		return c.JSON(statuses)
 }
