@@ -5,11 +5,9 @@ import (
   "log"
   "os"
   "time"
-  // "fmt"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
-  // "github.com/jackc/pgx/v5"
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/models"
   "golang.org/x/crypto/bcrypt"
@@ -57,47 +55,47 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-  conn := config.GetDB()
+    conn := config.GetDB()
 
     var user models.User
     var storedPassword string
+    var isAdmin bool
 
     if err := c.BodyParser(&user); err != nil {
-      return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+        return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
 
-    // Get user from database
     err := conn.QueryRow(context.Background(),
-      "SELECT id, username, email, password FROM users WHERE email=$1", user.Email).
-      Scan(&user.ID, &user.Username, &user.Email, &storedPassword)
+        "SELECT id, username, email, password, is_admin FROM users WHERE email = $1", user.Email).
+        Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin)
 
     if err != nil {
-      return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
     }
 
-    // Compare stored hashed password with entered password
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(user.Password)); err != nil {
-      return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+        return c.Status(401).JSON(fiber.Map{"error": "Incorrect password"})
     }
 
-    // Generate JWT token
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-      "user_id": user.ID,
-      "exp":     time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
+        "user_id":  user.ID,
+        "is_admin": user.IsAdmin,
+        "exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
     })
     tokenString, err := token.SignedString([]byte(secretKey))
 
     if err != nil {
-      return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
+        return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
     }
 
-    // ✅ Return both token and user data
     return c.JSON(fiber.Map{
-      "token": tokenString,
-      "user": fiber.Map{
-        "id":       user.ID,
-        "username": user.Username,
-        "email":    user.Email,
-      },
+        "token": tokenString,
+        "user": fiber.Map{
+            "id":       user.ID,
+            "username": user.Username,
+            "email":    user.Email,
+            "is_admin": user.IsAdmin,
+        },
     })
-  }
+}
+
