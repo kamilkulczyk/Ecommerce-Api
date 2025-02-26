@@ -19,6 +19,7 @@ const Login = () => {
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { email, password });
 
       if (res.data?.user && res.data?.token) {
+        localStorage.setItem("token", res.data.token);
         login(res.data.user, res.data.token);
         alert("Login successful!");
         navigate("/products");

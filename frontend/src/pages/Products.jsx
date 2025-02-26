@@ -32,7 +32,12 @@ const Products = () => {
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setStatuses(res.data);
       } catch (error) {
         console.error("Failed to fetch statuses:", error);
