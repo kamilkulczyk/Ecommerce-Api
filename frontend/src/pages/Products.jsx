@@ -51,7 +51,7 @@ const Products = () => {
           <select id="status" value={selectedStatus} onChange={(e) => setSelectedStatus(Number(e.target.value))}>
             {statuses.map((status) => (
               <option key={status.id} value={status.id}>
-                {status.name}
+                {status.status}
               </option>
             ))}
           </select>
