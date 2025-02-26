@@ -1,35 +1,41 @@
 package config
 
 import (
-  "context"
-  "fmt"
-  "log"
-  "os"
+    "context"
+    "fmt"
+    "log"
+    "os"
 
-  "github.com/jackc/pgx/v5"
+    "github.com/jackc/pgx/v5/pgxpool"
 )
 
-var db *pgx.Conn
+var dbpool *pgxpool.Pool
 
 func ConnectDB() {
-  connStr := fmt.Sprintf(
-    "user=%s password=%s host=%s port=%s dbname=%s sslmode=require",
-    os.Getenv("DB_USER"),
-    os.Getenv("DB_PASS"),
-    os.Getenv("DB_HOST"),
-    os.Getenv("DB_PORT"),
-    os.Getenv("DB_NAME"),
-  )
+    connStr := fmt.Sprintf(
+        "user=%s password=%s host=%s port=%s dbname=%s sslmode=require",
+        os.Getenv("DB_USER"),
+        os.Getenv("DB_PASS"),
+        os.Getenv("DB_HOST"),
+        os.Getenv("DB_PORT"),
+        os.Getenv("DB_NAME"),
+    )
 
-  var err error
-  db, err = pgx.Connect(context.Background(), connStr)
-  if err != nil {
-    log.Fatalf("Failed to connect to database: %v", err)
-  }
+    var err error
+    dbpool, err = pgxpool.New(context.Background(), connStr)
+    if err != nil {
+        log.Fatalf("Failed to connect to database: %v", err)
+    }
 
-  log.Println("✅ Connected to database")
+    log.Println("✅ Connected to database (Using Pool)")
 }
 
-func GetDB() *pgx.Conn {
-  return db
+func GetDB() *pgxpool.Pool {
+    return dbpool
+}
+
+func CloseDB() {
+    if dbpool != nil {
+        dbpool.Close()
+    }
 }

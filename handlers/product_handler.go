@@ -12,20 +12,26 @@ import (
 func GetProducts(c *fiber.Ctx) error {
 		statusFilter := 2 // Default: Only show approved products
 
-		// If admin, allow fetching all statuses
 		isAdminValue := c.Locals("is_admin")
-		isAdmin, ok := isAdminValue.(bool) // Check if it's a valid boolean
-	
-		if ok && isAdmin { 
+		isAdmin, ok := isAdminValue.(bool)
+
+		if ok && isAdmin {
 				statusFilter = c.QueryInt("status_id", 2)
 		}
 
+		db := config.GetDB()
+		conn, err := db.Acquire(context.Background())
+		if err != nil {
+				log.Println("Failed to acquire DB connection:", err)
+				return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+		}
+		defer conn.Release()
 
-		rows, err := config.GetDB().Query(context.Background(),
+		rows, err := conn.Query(context.Background(),
 				"SELECT id, name, price, stock, status_id FROM products WHERE status_id = $1", statusFilter)
 
 		if err != nil {
-				log.Println(err)
+				log.Println("Error fetching products:", err)
 				return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch products"})
 		}
 		defer rows.Close()
@@ -34,13 +40,20 @@ func GetProducts(c *fiber.Ctx) error {
 		for rows.Next() {
 				var product models.Product
 				if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID); err != nil {
+						log.Println("Error scanning product:", err)
 						return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
 				}
 				products = append(products, product)
 		}
 
+		if err := rows.Err(); err != nil {
+				log.Println("Rows iteration error:", err)
+				return c.Status(500).JSON(fiber.Map{"error": "Failed to process products"})
+		}
+
 		return c.JSON(products)
 }
+
 
 
 func CreateProduct(c *fiber.Ctx) error {
@@ -110,9 +123,17 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 }
 
 func GetProductStatuses(c *fiber.Ctx) error {
-		rows, err := config.GetDB().Query(context.Background(), "SELECT id, status FROM product_statuses")
-
+		db := config.GetDB()
+		conn, err := db.Acquire(context.Background())
 		if err != nil {
+				log.Println("Failed to acquire DB connection:", err)
+				return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+		}
+		defer conn.Release()
+
+		rows, err := conn.Query(context.Background(), "SELECT id, status FROM product_statuses")
+		if err != nil {
+				log.Println("Error fetching product statuses:", err)
 				return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch statuses"})
 		}
 		defer rows.Close()
@@ -121,10 +142,17 @@ func GetProductStatuses(c *fiber.Ctx) error {
 		for rows.Next() {
 				var status models.ProductStatus
 				if err := rows.Scan(&status.ID, &status.Status); err != nil {
+						log.Println("Error scanning product status:", err)
 						return c.Status(500).JSON(fiber.Map{"error": "Failed to scan status"})
 				}
 				statuses = append(statuses, status)
 		}
 
+		if err := rows.Err(); err != nil {
+				log.Println("Rows iteration error:", err)
+				return c.Status(500).JSON(fiber.Map{"error": "Failed to process statuses"})
+		}
+
 		return c.JSON(statuses)
 }
+
