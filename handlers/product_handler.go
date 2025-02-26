@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v4"
 	"github.com/kamilkulczyk/Ecommerce-Api/config"
 	"github.com/kamilkulczyk/Ecommerce-Api/models"
 )
@@ -179,5 +180,47 @@ func GetProductStatuses(c *fiber.Ctx) error {
 		}
 
 		return c.JSON(statuses)
+}
+
+func GetProductByID(c *fiber.Ctx) error {
+	productID := c.Params("id")
+
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
+
+	query := `
+	SELECT 
+			p.id, p.name, p.price, p.stock, p.status_id, 
+			d.description, 
+			COALESCE(json_agg(i.image_url) FILTER (WHERE i.image_url IS NOT NULL), '[]') AS images
+	FROM products p
+	LEFT JOIN product_details d ON p.id = d.product_id
+	LEFT JOIN product_images i ON p.id = i.product_id
+	WHERE p.id = $1
+	GROUP BY p.id, d.description;
+	`
+
+	var product models.Product
+
+	row := conn.QueryRow(context.Background(), query, productID)
+
+	err = row.Scan(
+		&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID,
+		&product.Description, &product.Specifications, &product.Images,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return c.Status(404).JSON(fiber.Map{"error": "Product not found"})
+		}
+		fmt.Println("ERROR: Failed to fetch product:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	return c.JSON(product)
 }
 
