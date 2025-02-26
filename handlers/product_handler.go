@@ -25,6 +25,8 @@ func GetProducts(c *fiber.Ctx) error {
 
 	statusFilter := c.QueryInt("status_id", 2)
 	fmt.Println("DEBUG: requested status:", statusFilter)
+	fmt.Println("DEBUG: ok:", ok)
+	fmt.Println("DEBUG: isAdmin:", isAdmin)
 	if !ok || !isAdmin {
 		statusFilter = 2 // Non-admins only see approved products
 	}
