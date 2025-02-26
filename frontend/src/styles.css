@@ -28,25 +28,25 @@ form {
     margin: 0 auto; /* Center the form */
   }
   
-  /* input, button {
-    padding: 10px;
+/* Status Filter Styling */
+.status-filter {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-filter label {
     font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  } */
-  
+    font-weight: bold;
+}
+
+.status-filter select {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
   
   /* Product Grid */
   .products-container {
