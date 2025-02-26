@@ -10,6 +10,22 @@ const Products = () => {
   const [statuses, setStatuses] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(2);
 
+  const fetchProducts = async (status_id = 2) => {
+    console.log("Fetching products with status:", status_id);
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/products`;
+      const res = await axios.get(url, {
+        params: user?.is_admin ? { status_id } : {},
+        withCredentials: true,
+      });
+
+      console.log("Fetched products:", res.data);
+      setProducts(res.data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
   const handleStatusChange = (e) => {
     const newStatus = Number(e.target.value);
     console.log("Status changed to:", newStatus);
@@ -30,24 +46,8 @@ const Products = () => {
     fetchStatuses();
   }, []);
 
-  const fetchProducts = async (status_id = 2) => {
-    console.log("Fetching products with status:", status_id);
-    try {
-      const url = `${import.meta.env.VITE_API_URL}/products`;
-      const res = await axios.get(url, {
-        params: user?.is_admin ? { status_id } : {},
-        withCredentials: true,
-      });
-  
-      console.log("Fetched products:", res.data);
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };  
-
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(selectedStatus);
     console.log("Fetching products on mount...");
   }, [selectedStatus, user?.is_admin]);
 
@@ -67,7 +67,6 @@ const Products = () => {
           </select>
         </div>
       )}
-
 
       <div className="products-container">
         {products.length > 0 ? (
