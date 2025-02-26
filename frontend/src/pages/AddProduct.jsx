@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./AddProduct.css"
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const AddProduct = () => {
     formData.append("stock", stock);
     formData.append("description", description);
     formData.append("attributes", JSON.stringify({}));
-    
+
     images.forEach((image) => formData.append("images", image));
 
     try {

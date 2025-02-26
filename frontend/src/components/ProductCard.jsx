@@ -1,8 +1,8 @@
-import { useContext, useState } from "react";
+import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
-import axios from "axios";
 
 const ProductCard = ({ product, statuses, fetchProducts }) => {
   const { cart, addToCart } = useCart();
@@ -10,13 +10,10 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
   const [selectedStatus, setSelectedStatus] = useState(product.status_id);
   const cartItem = cart.find((item) => item.id === product.id);
   const maxAvailable = product.stock - (cartItem ? cartItem.quantity : 0);
-
   const [quantity, setQuantity] = useState(1);
 
-  const handleQuantityChange = (e) => {
-    let value = parseInt(e.target.value, 10) || 1;
-    value = Math.max(1, Math.min(value, maxAvailable));
-    setQuantity(value);
+  const handleQuantityChange = (newQuantity) => {
+    setQuantity(Math.max(1, Math.min(newQuantity, maxAvailable)));
   };
 
   const handleStatusChange = async (newStatusId) => {
@@ -35,14 +32,20 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
 
   return (
     <div className="product-card">
-      <h3>
-        <Link to={`/products/${product.id}`}>{product.name}</Link>
+      <h3 className="product-title">
+        <Link to={`/products/${product.id}`} className="product-link">
+          {product.name}
+        </Link>
       </h3>
-      <p>💰 ${product.price}</p>
-      <p>📦 In Stock: {product.stock}</p>
+      <p className="product-price">💰 ${product.price}</p>
+      <p className="product-stock">📦 In Stock: {product.stock}</p>
 
       {user?.is_admin && (
-        <select value={selectedStatus} onChange={(e) => handleStatusChange(e.target.value)}>
+        <select
+          value={selectedStatus}
+          onChange={(e) => handleStatusChange(e.target.value)}
+          className="product-status"
+        >
           {statuses.map((status) => (
             <option key={status.id} value={status.id}>
               {status.status}
@@ -51,16 +54,17 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
         </select>
       )}
 
-      <input
-        type="number"
-        value={quantity}
-        min="1"
-        max={maxAvailable}
-        onChange={handleQuantityChange}
-        disabled={maxAvailable === 0}
-      />
+      <div className="quantity-controls">
+        <button className="quantity-btn" onClick={() => handleQuantityChange(quantity - 1)} disabled={quantity === 1}>
+          -
+        </button>
+        <span className="quantity-value">{quantity}</span>
+        <button className="quantity-btn" onClick={() => handleQuantityChange(quantity + 1)} disabled={quantity >= maxAvailable}>
+          +
+        </button>
+      </div>
 
-      <button onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
+      <button className="add-to-cart" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
         Add to Cart
       </button>
     </div>
