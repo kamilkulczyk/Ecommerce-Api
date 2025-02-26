@@ -90,14 +90,7 @@ func CreateProduct(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
-	var product struct {
-		Name        string   `json:"name"`
-		Price       float64  `json:"price"`
-		Stock       int      `json:"stock"`
-		Description string   `json:"description"`
-		Attributes  string   `json:"attributes"`
-		Images      []string `json:"images"`
-	}
+	var product models.Product
 
 	if err := c.BodyParser(&product); err != nil {
 		fmt.Println("ERROR: Invalid request body:", err)
