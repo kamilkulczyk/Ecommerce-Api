@@ -35,14 +35,14 @@ const Products = () => {
     <div className="page-container">
       <h2>Products</h2>
       <div className="products-container">
-        {products.length > 0 ? (
+        {Array.isArray(products) && products.length > 0 ? (
             products.map((product) => (
-                <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
+            <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
             ))
         ) : (
             <p>No products available</p>
         )}
-      </div>
+        </div>
     </div>
   );
 };
