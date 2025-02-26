@@ -40,7 +40,7 @@ const Products = () => {
           ? { Authorization: `Bearer ${token}` }
           : {};
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`, {
-            token
+            headers
         });
         setStatuses(res.data);
       } catch (error) {
