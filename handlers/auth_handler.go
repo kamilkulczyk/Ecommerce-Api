@@ -73,6 +73,9 @@ func Login(c *fiber.Ctx) error {
       "SELECT id, username, email, password, is_admin FROM users WHERE email = $1", req.Email).
       Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.IsAdmin)
 
+    fmt.Println("User input password:", req.Password)
+    fmt.Println("Stored hashed password:", user.Password)
+  
     if err != nil {
       if err == pgx.ErrNoRows {
           return c.Status(401).JSON(fiber.Map{"error": "User not found"})
