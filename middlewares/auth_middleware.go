@@ -1,8 +1,11 @@
 package middlewares
 
 import (
+	"log"
+	"os"
 	"fmt"
 
+	"github.com/joho/godotenv"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
