@@ -211,7 +211,7 @@ func GetProductByID(c *fiber.Ctx) error {
 
 	err = row.Scan(
 		&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID,
-		&product.Description, &product.Specifications, &product.Images,
+		&product.Description, &product.Images,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
