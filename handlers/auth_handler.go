@@ -34,7 +34,7 @@ func Register(c *fiber.Ctx) error {
   if err := c.BodyParser(&user); err != nil {
     return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
   }
-
+  fmt.Println("DEBUG: user Password:", user.Password)
   hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
