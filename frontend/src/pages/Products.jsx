@@ -10,6 +10,12 @@ const Products = () => {
   const [statuses, setStatuses] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(2);
 
+  const handleStatusChange = (e) => {
+    const newStatus = Number(e.target.value);
+    setSelectedStatus(newStatus);
+    fetchProducts(newStatus);
+  };
+
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
@@ -23,19 +29,19 @@ const Products = () => {
     fetchStatuses();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (status_id = 2) => {
     try {
       const url = `${import.meta.env.VITE_API_URL}/products`;
       const res = await axios.get(url, {
-        params: user?.is_admin ? { status_id: selectedStatus } : {},
+        params: user?.is_admin ? { status_id } : {},
         withCredentials: true,
       });
-
+  
       setProducts(res.data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
-  };
+  };  
 
   useEffect(() => {
     fetchProducts();
@@ -48,15 +54,16 @@ const Products = () => {
       {user?.is_admin && statuses.length > 0 && (
         <div className="status-filter">
           <label htmlFor="status">Filter by Status:</label>
-          <select id="status" value={selectedStatus} onChange={(e) => setSelectedStatus(Number(e.target.value))}>
+          <select id="status" value={selectedStatus} onChange={handleStatusChange}>
             {statuses.map((status) => (
               <option key={status.id} value={status.id}>
-                {status.status}
+                {status.name}
               </option>
             ))}
           </select>
         </div>
       )}
+
 
       <div className="products-container">
         {products.length > 0 ? (
