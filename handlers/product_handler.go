@@ -12,14 +12,6 @@ import (
 )
 
 func GetProducts(c *fiber.Ctx) error {
-	statusFilter := 2 // Default: Only show approved products
-
-	isAdminValue := c.Locals("is_admin")
-	isAdmin, ok := isAdminValue.(bool)
-	if ok && isAdmin {
-		statusFilter = c.QueryInt("status_id", 2)
-	}
-
 	db := config.GetDB()
 	conn, err := db.Acquire(context.Background())
 	if err != nil {
@@ -28,12 +20,19 @@ func GetProducts(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-	// Fetch product details along with ONE thumbnail image (if exists)
+	isAdminValue := c.Locals("is_admin")
+	isAdmin, ok := isAdminValue.(bool)
+
+	statusFilter := c.QueryInt("status_id", 2)
+	if !ok || !isAdmin {
+		statusFilter = 2 // Non-admins only see approved products
+	}
+
 	rows, err := conn.Query(context.Background(), `
 		SELECT p.id, p.name, p.price, p.stock, p.status_id,
 					 (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.is_thumbnail DESC, pi.id ASC LIMIT 1) AS image
 		FROM products p
-		WHERE p.status_id = $1
+		WHERE ($1 = 0 OR p.status_id = $1)
 	`, statusFilter)
 
 	if err != nil {
@@ -68,6 +67,7 @@ func GetProducts(c *fiber.Ctx) error {
 
 	return c.JSON(products)
 }
+
 
 func CreateProduct(c *fiber.Ctx) error {
 	db := config.GetDB()
