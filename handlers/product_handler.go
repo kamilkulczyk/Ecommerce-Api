@@ -68,7 +68,7 @@ func GetProducts(c *fiber.Ctx) error {
 		products = append(products, product)
 	}
 
-	if err := rows.Err(); err {
+	if err := rows.Err(); err != nil {
 		log.Println("Rows iteration error:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to process products"})
 	}
