@@ -35,9 +35,13 @@ const Products = () => {
     <div className="page-container">
       <h2>Products</h2>
       <div className="products-container">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
-        ))}
+        {products.length > 0 ? (
+            products.map((product) => (
+                <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
+            ))
+        ) : (
+            <p>No products available</p>
+        )}
       </div>
     </div>
   );

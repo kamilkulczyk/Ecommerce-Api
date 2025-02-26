@@ -29,7 +29,6 @@ const AddProduct = () => {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Retrieved token:", token); // Debugging log
       await axios.post(import.meta.env.VITE_API_URL + "/products", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
