@@ -5,11 +5,11 @@ import (
   "log"
   "os"
   "time"
-  "fmt"
+  // "fmt"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
-  "github.com/jackc/pgx/v5"
+  // "github.com/jackc/pgx/v5"
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/models"
   "golang.org/x/crypto/bcrypt"
