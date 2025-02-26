@@ -128,6 +128,15 @@
     cursor: not-allowed;
 }
 
+.cart-item-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.cart-item-name a:hover {
+    cursor: pointer;
+}
+
 /* Mobile Optimization */
 @media (max-width: 600px) {
     .cart-item {
