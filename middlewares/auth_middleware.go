@@ -55,6 +55,7 @@ func JWTMiddleware() fiber.Handler {
 			fmt.Println("ERROR: user_id missing or invalid in claims:", claims)
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
+		fmt.Printf("DEBUG: Parsed is_admin: %v (type: %T)\n", claims["is_admin"], claims["is_admin"])
 
 		isAdmin := false
 		switch v := claims["is_admin"].(type) {
