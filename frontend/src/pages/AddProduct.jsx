@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./AddProduct.css"
+import "./AddProduct.css";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -9,34 +9,36 @@ const AddProduct = () => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
-  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState([""]);
   const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setImages(files);
+  const handleImageUrlChange = (index, value) => {
+    const newImageUrls = [...imageUrls];
+    newImageUrls[index] = value;
+    setImageUrls(newImageUrls);
+  };
+
+  const addImageUrlField = () => {
+    setImageUrls([...imageUrls, ""]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("price", price);
-    formData.append("stock", stock);
-    formData.append("description", description);
-    formData.append("attributes", JSON.stringify({}));
-
-    images.forEach((image) => formData.append("images", image));
+    const formData = {
+      name,
+      price,
+      stock,
+      description,
+      attributes: {}, 
+      images: imageUrls.filter(url => url.trim() !== ""),
+    };
 
     try {
       const token = localStorage.getItem("token");
       await axios.post(import.meta.env.VITE_API_URL + "/products", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       alert("Product submitted for approval!");
@@ -57,7 +59,21 @@ const AddProduct = () => {
         <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} required />
         <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} required />
         <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        <input type="file" multiple onChange={handleImageUpload} accept="image/*" />
+
+        <div className="image-urls">
+          {imageUrls.map((url, index) => (
+            <input
+              key={index}
+              type="text"
+              placeholder="Image URL"
+              value={url}
+              onChange={(e) => handleImageUrlChange(index, e.target.value)}
+              required
+            />
+          ))}
+          <button type="button" onClick={addImageUrlField}>+ Add Another Image</button>
+        </div>
+
         <button type="submit" disabled={loading}>{loading ? "Submitting..." : "Submit"}</button>
       </form>
     </div>
