@@ -84,7 +84,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	var productID int
-	err := conn.QueryRow(context.Background(),
+	err = conn.QueryRow(context.Background(),
 		"INSERT INTO products (name, price, stock, user_id) VALUES ($1, $2, $3, $4) RETURNING id",
 		product.Name, product.Price, product.Stock, userID,
 	).Scan(&productID)
@@ -131,7 +131,7 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 		}
 
-		_, err := conn.Exec(context.Background(),
+		_, err = conn.Exec(context.Background(),
 				"UPDATE products SET status_id=$1 WHERE id=$2", body.StatusID, id)
 
 		if err != nil {
