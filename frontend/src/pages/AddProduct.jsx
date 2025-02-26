@@ -6,8 +6,8 @@ import "./AddProduct.css";
 const AddProduct = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [price, setPrice] = useState(0);
+  const [stock, setStock] = useState(0);
   const [description, setDescription] = useState("");
   const [imageUrls, setImageUrls] = useState([""]);
   const [loading, setLoading] = useState(false);
@@ -56,8 +56,8 @@ const AddProduct = () => {
       <h2>Add a New Product</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required />
-        <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} required />
-        <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} required />
+        <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(parseFloat(e.target.value) || 0)} required />
+        <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(parseFloat(e.target.value) || 0)} required />
         <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
 
         <div className="image-urls">
