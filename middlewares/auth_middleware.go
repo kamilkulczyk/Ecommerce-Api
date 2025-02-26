@@ -7,7 +7,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = "your_secret_key"
+var secretKey string
+
+func init() {
+	_ = godotenv.Load()
+
+	secretKey = os.Getenv("JWT_SECRET")
+	if secretKey == "" {
+		log.Fatal("❌ JWT_SECRET is not set in environment variables")
+	}
+}
 
 func JWTMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
