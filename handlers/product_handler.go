@@ -12,49 +12,52 @@ import (
 )
 
 func GetProducts(c *fiber.Ctx) error {
-		statusFilter := 2 // Default: Only show approved products
+	statusFilter := 2 // Default: Only show approved products
 
-		isAdminValue := c.Locals("is_admin")
-		isAdmin, ok := isAdminValue.(bool)
+	isAdminValue := c.Locals("is_admin")
+	isAdmin, ok := isAdminValue.(bool)
+	if ok && isAdmin {
+		statusFilter = c.QueryInt("status_id", 2)
+	}
 
-		if ok && isAdmin {
-				statusFilter = c.QueryInt("status_id", 2)
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		log.Println("Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		`SELECT p.id, p.name, p.price, p.stock, p.status_id, COALESCE(pi.image_url, '') 
+		 FROM products p 
+		 LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_thumbnail = TRUE
+		 WHERE p.status_id = $1`, statusFilter)
+
+	if err != nil {
+		log.Println("Error fetching products:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch products"})
+	}
+	defer rows.Close()
+
+	var products []models.Product
+	for rows.Next() {
+		var product models.Product
+		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID, &product.Images); err != nil {
+			log.Println("Error scanning product:", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
 		}
+		products = append(products, product)
+	}
 
-		db := config.GetDB()
-		conn, err := db.Acquire(context.Background())
-		if err != nil {
-				log.Println("Failed to acquire DB connection:", err)
-				return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
-		}
-		defer conn.Release()
+	if err := rows.Err(); err != nil {
+		log.Println("Rows iteration error:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to process products"})
+	}
 
-		rows, err := conn.Query(context.Background(),
-				"SELECT id, name, price, stock, status_id FROM products WHERE status_id = $1", statusFilter)
-
-		if err != nil {
-				log.Println("Error fetching products:", err)
-				return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch products"})
-		}
-		defer rows.Close()
-
-		var products []models.Product
-		for rows.Next() {
-				var product models.Product
-				if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID); err != nil {
-						log.Println("Error scanning product:", err)
-						return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
-				}
-				products = append(products, product)
-		}
-
-		if err := rows.Err(); err != nil {
-				log.Println("Rows iteration error:", err)
-				return c.Status(500).JSON(fiber.Map{"error": "Failed to process products"})
-		}
-
-		return c.JSON(products)
+	return c.JSON(products)
 }
+
 
 
 
