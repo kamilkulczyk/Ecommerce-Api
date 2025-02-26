@@ -28,11 +28,13 @@ func GetProducts(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-	rows, err := conn.Query(context.Background(),
-		`SELECT p.id, p.name, p.price, p.stock, p.status_id, COALESCE(pi.image_url, '') 
-		 FROM products p 
-		 LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_thumbnail = TRUE
-		 WHERE p.status_id = $1`, statusFilter)
+	// Fetch product details along with ONE thumbnail image (if exists)
+	rows, err := conn.Query(context.Background(), `
+		SELECT p.id, p.name, p.price, p.stock, p.status_id,
+					 (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.is_thumbnail DESC, pi.id ASC LIMIT 1) AS image
+		FROM products p
+		WHERE p.status_id = $1
+	`, statusFilter)
 
 	if err != nil {
 		log.Println("Error fetching products:", err)
@@ -43,10 +45,19 @@ func GetProducts(c *fiber.Ctx) error {
 	var products []models.Product
 	for rows.Next() {
 		var product models.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID, &product.Images); err != nil {
+		var imageURL *string
+
+		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.StatusID, &imageURL); err != nil {
 			log.Println("Error scanning product:", err)
 			return c.Status(500).JSON(fiber.Map{"error": "Failed to scan product"})
 		}
+
+		if imageURL != nil {
+			product.Images = []string{*imageURL}
+		} else {
+			product.Images = []string{"/placeholder.jpg"}
+		}
+
 		products = append(products, product)
 	}
 
@@ -57,9 +68,6 @@ func GetProducts(c *fiber.Ctx) error {
 
 	return c.JSON(products)
 }
-
-
-
 
 func CreateProduct(c *fiber.Ctx) error {
 	db := config.GetDB()
