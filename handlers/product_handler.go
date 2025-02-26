@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"log"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamilkulczyk/Ecommerce-Api/config"
@@ -68,7 +67,6 @@ func CreateProduct(c *fiber.Ctx) error {
 	
 	userID, ok := c.Locals("user_id").(int)
 	if !ok {
-		fmt.Println("Failed to get user ID from context", userID)
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
