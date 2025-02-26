@@ -7,6 +7,7 @@ type Product struct {
 	Stock          int      `json:"stock"`
 	StatusID       int      `json:"status_id"`
 	Description    string   `json:"description"`
+	Attributes  map[string][]map[string]string `json:"attributes"`
 	Images         []string `json:"images"`
 }
 
