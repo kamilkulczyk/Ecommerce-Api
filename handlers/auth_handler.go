@@ -59,7 +59,6 @@ func Login(c *fiber.Ctx) error {
 
     var user models.User
     var storedPassword string
-    var isAdmin bool
 
     if err := c.BodyParser(&user); err != nil {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
