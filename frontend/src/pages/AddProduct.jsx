@@ -25,6 +25,8 @@ const AddProduct = () => {
     formData.append("price", price);
     formData.append("stock", stock);
     formData.append("description", description);
+    formData.append("attributes", JSON.stringify({}));
+    
     images.forEach((image) => formData.append("images", image));
 
     try {
