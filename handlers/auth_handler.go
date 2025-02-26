@@ -84,6 +84,7 @@ func Login(c *fiber.Ctx) error {
     }
 
     fmt.Println("DEBUG: Password matches!")
+    fmt.Println("DEBUG: is admin:", user.IsAdmin)
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "user_id":  user.ID,
