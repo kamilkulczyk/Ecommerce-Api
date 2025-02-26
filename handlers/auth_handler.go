@@ -80,8 +80,8 @@ func Login(c *fiber.Ctx) error {
     }
 
     fmt.Println("DEBUG: User found:", user.Email)
-    fmt.Println("DEBUG: Provided password:", req.Password)
-    fmt.Println("DEBUG: Stored hash from DB:", storedPassword)
+    fmt.Println("DEBUG: Provided password:", req.Password, "| Length:", len(req.Password))
+    fmt.Println("DEBUG: Stored hash:", storedPassword, "| Length:", len(storedPassword))
 
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.Password)); err != nil {
         fmt.Println("DEBUG: Password does NOT match:", err)
