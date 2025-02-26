@@ -8,6 +8,7 @@ import (
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
+  "github.com/jackc/pgx/v5"
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/models"
   "golang.org/x/crypto/bcrypt"
@@ -55,7 +56,8 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-    var req struct {
+  conn := config.GetDB()
+  var req struct {
         Email    string `json:"email"`
         Password string `json:"password"`
     }
