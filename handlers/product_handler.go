@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"log"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamilkulczyk/Ecommerce-Api/config"
@@ -60,13 +61,14 @@ func CreateProduct(c *fiber.Ctx) error {
 	db := config.GetDB()
 	conn, err := db.Acquire(context.Background())
 	if err != nil {
-		log.Println("Failed to acquire DB connection:", err)
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
 	}
 	defer conn.Release()
 	
 	userID, ok := c.Locals("user_id").(int)
 	if !ok {
+		fmt.Println("ERROR: Failed to get user ID from context")
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
@@ -80,6 +82,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&product); err != nil {
+		fmt.Println("ERROR: Invalid request body:", err)
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
@@ -90,6 +93,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	).Scan(&productID)
 
 	if err != nil {
+		fmt.Println("ERROR: Failed to insert product:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to insert product"})
 	}
 
@@ -99,6 +103,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	)
 
 	if err != nil {
+		fmt.Println("ERROR: Failed to insert product details:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to insert product details"})
 	}
 
@@ -108,6 +113,7 @@ func CreateProduct(c *fiber.Ctx) error {
 			productID, imgURL, i == 0,
 		)
 		if err != nil {
+			fmt.Println("ERROR: Failed to insert product images:", err)
 			return c.Status(500).JSON(fiber.Map{"error": "Failed to insert product images"})
 		}
 	}
