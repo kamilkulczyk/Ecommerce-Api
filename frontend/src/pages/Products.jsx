@@ -12,6 +12,7 @@ const Products = () => {
 
   const handleStatusChange = (e) => {
     const newStatus = Number(e.target.value);
+    console.log("Status changed to:", newStatus);
     setSelectedStatus(newStatus);
     fetchProducts(newStatus);
   };
@@ -30,6 +31,7 @@ const Products = () => {
   }, []);
 
   const fetchProducts = async (status_id = 2) => {
+    console.log("Fetching products with status:", status_id);
     try {
       const url = `${import.meta.env.VITE_API_URL}/products`;
       const res = await axios.get(url, {
@@ -37,6 +39,7 @@ const Products = () => {
         withCredentials: true,
       });
   
+      console.log("Fetched products:", res.data);
       setProducts(res.data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
@@ -45,6 +48,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    console.log("Fetching products on mount...");
   }, [selectedStatus, user?.is_admin]);
 
   return (
