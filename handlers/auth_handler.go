@@ -74,17 +74,12 @@ func Login(c *fiber.Ctx) error {
         Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin)
 
     if err != nil {
-        fmt.Println("DEBUG: No user found for email:", req.Email)
         return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
     }
 
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.Password)); err != nil {
-        fmt.Println("DEBUG: Password does NOT match:", err)
-        return c.Status(401).JSON(fiber.Map{"error": "Incorrect password"})
+        return c.Status(401).JSON(fiber.Map{"error": "Incorrect email or password"})
     }
-
-    fmt.Println("DEBUG: Password matches!")
-    fmt.Println("DEBUG: is admin:", user.IsAdmin)
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "user_id":  user.ID,

@@ -24,7 +24,6 @@ func init() {
 func JWTMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		tokenString := c.Get("Authorization")
-		fmt.Println("DEBUG: Authorization Header:", tokenString)
 
 		if tokenString == "" {
 			fmt.Println("ERROR: No Authorization header found")
@@ -55,7 +54,6 @@ func JWTMiddleware() fiber.Handler {
 			fmt.Println("ERROR: user_id missing or invalid in claims:", claims)
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
-		fmt.Printf("DEBUG: Parsed is_admin: %v (type: %T)\n", claims["is_admin"], claims["is_admin"])
 
 		isAdmin := false
 		switch v := claims["is_admin"].(type) {
@@ -70,7 +68,6 @@ func JWTMiddleware() fiber.Handler {
 
 		c.Locals("user_id", int(userID))
 		c.Locals("is_admin", isAdmin)
-		fmt.Println("DEBUG: Set user_id:", int(userID), "| is_admin:", isAdmin)
 
 		return c.Next()
 	}
@@ -103,8 +100,6 @@ func OptionalJWTMiddleware() fiber.Handler {
 						return c.Next()
 				}
 
-				fmt.Println("DEBUG: JWT Claims:", claims)
-
 				isAdmin := false
 				switch v := claims["is_admin"].(type) {
 				case bool:
@@ -119,7 +114,6 @@ func OptionalJWTMiddleware() fiber.Handler {
 
 				c.Locals("user_id", int(userID))
 				c.Locals("is_admin", isAdmin)
-				fmt.Println("DEBUG: Set user_id:", int(userID), "| is_admin:", isAdmin)
 
 				return c.Next()
 		}
