@@ -30,21 +30,11 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const increaseQuantity = (productId) => {
+  const updateQuantity = (productId, newQuantity) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === productId && item.quantity < item.stock
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
-    );
-  };
-
-  const decreaseQuantity = (productId) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === productId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
+        item.id === productId
+          ? { ...item, quantity: Math.max(1, Math.min(newQuantity, item.stock)) }
           : item
       )
     );
@@ -60,7 +50,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart }}
+      value={{ cart, addToCart, updateQuantity, removeFromCart, clearCart }}
     >
       {children}
     </CartContext.Provider>
