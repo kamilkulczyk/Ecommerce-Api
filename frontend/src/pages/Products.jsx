@@ -12,6 +12,7 @@ const Products = () => {
 
   const fetchProducts = async (status_id = 2) => {
     try {
+      const token = localStorage.getItem("token");
       const headers = token
         ? { Authorization: `Bearer ${token}` }
         : {};
@@ -36,6 +37,7 @@ const Products = () => {
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
+        const token = localStorage.getItem("token");
         const headers = token
           ? { Authorization: `Bearer ${token}` }
           : {};
