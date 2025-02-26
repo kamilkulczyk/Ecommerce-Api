@@ -76,6 +76,10 @@ func Login(c *fiber.Ctx) error {
 
     fmt.Println("User input password:", req.Password)
     fmt.Println("Stored hashed password:", user.Password)
+    fmt.Println("Stored:", []byte(user.Password))
+    fmt.Println("Input:", []byte(req.Password))
+    hashedA, _ := bcrypt.GenerateFromPassword([]byte("a"), bcrypt.DefaultCost)
+    fmt.Println("Manually hashed 'a':", string(hashedA))
   
     if err != nil {
       if err == pgx.ErrNoRows {
@@ -85,6 +89,7 @@ func Login(c *fiber.Ctx) error {
     }
   
     if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+      fmt.Println("Password comparison error:", err)
       return c.Status(401).JSON(fiber.Map{"error": "Incorrect password"})
     }
 
