@@ -57,7 +57,18 @@ func GetProducts(c *fiber.Ctx) error {
 
 
 func CreateProduct(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(int)
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		log.Println("Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
+	
+	userID, ok := c.Locals("user_id").(int)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
+	}
 
 	var product struct {
 		Name        string   `json:"name"`
@@ -73,7 +84,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	var productID int
-	err := config.GetDB().QueryRow(context.Background(),
+	err := conn.QueryRow(context.Background(),
 		"INSERT INTO products (name, price, stock, user_id) VALUES ($1, $2, $3, $4) RETURNING id",
 		product.Name, product.Price, product.Stock, userID,
 	).Scan(&productID)
@@ -82,7 +93,7 @@ func CreateProduct(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to insert product"})
 	}
 
-	_, err = config.GetDB().Exec(context.Background(),
+	_, err = conn.Exec(context.Background(),
 		"INSERT INTO product_details (product_id, description, attributes) VALUES ($1, $2, $3)",
 		productID, product.Description, product.Attributes,
 	)
@@ -92,7 +103,7 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	for i, imgURL := range product.Images {
-		_, err = config.GetDB().Exec(context.Background(),
+		_, err = conn.Exec(context.Background(),
 			"INSERT INTO product_images (product_id, image_url, is_thumbnail) VALUES ($1, $2, $3)",
 			productID, imgURL, i == 0,
 		)
@@ -105,6 +116,14 @@ func CreateProduct(c *fiber.Ctx) error {
 }
 
 func UpdateProductStatus(c *fiber.Ctx) error {
+		db := config.GetDB()
+		conn, err := db.Acquire(context.Background())
+		if err != nil {
+			log.Println("Failed to acquire DB connection:", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+		}
+		defer conn.Release()
+	
 		id := c.Params("id")
 		var body struct { StatusID int `json:"status_id"` }
 
@@ -112,7 +131,7 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 		}
 
-		_, err := config.GetDB().Exec(context.Background(),
+		_, err := conn.Exec(context.Background(),
 				"UPDATE products SET status_id=$1 WHERE id=$2", body.StatusID, id)
 
 		if err != nil {
