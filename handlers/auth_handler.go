@@ -5,6 +5,7 @@ import (
   "log"
   "os"
   "time"
+  "fmt"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
@@ -33,7 +34,7 @@ func Register(c *fiber.Ctx) error {
   if err := c.BodyParser(&user); err != nil {
     return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
   }
-
+  fmt.println("register user before hashing:",user)
   hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
@@ -41,7 +42,7 @@ func Register(c *fiber.Ctx) error {
   user.Password = string(hashedPassword)
 
   createdAt := time.Now()
-
+  fmt.println("register user after hashing:",user)
   _, err = conn.Exec(context.Background(),
     "INSERT INTO users (username, email, password, created_at) VALUES ($1, $2, $3, $4)",
     user.Username, user.Email, user.Password, createdAt)
@@ -63,7 +64,7 @@ func Login(c *fiber.Ctx) error {
     if err := c.BodyParser(&user); err != nil {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
-
+    fmt.println("login user:",user)
     err := conn.QueryRow(context.Background(),
         "SELECT id, username, email, password, is_admin FROM users WHERE email = $1", user.Email).
         Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin)
