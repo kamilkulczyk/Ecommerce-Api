@@ -1,17 +1,11 @@
 .cart-container {
     max-width: 900px;
+    width: 90%;
     margin: 20px auto;
     padding: 20px;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-.cart-title {
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
 }
 
 .cart-items {
@@ -29,6 +23,7 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     gap: 15px;
+    flex-wrap: wrap; /* Allows items to stack on mobile */
 }
 
 .cart-item-left {
@@ -36,6 +31,7 @@
     align-items: center;
     flex: 1;
     gap: 15px;
+    min-width: 150px;
 }
 
 .cart-item-image {
@@ -45,30 +41,12 @@
     border-radius: 5px;
 }
 
-.cart-item-name {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.cart-item-name a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.cart-item-name a:hover {
-    cursor: pointer;
-}
-  
-
 .cart-item-right {
     display: flex;
     align-items: center;
-    gap: 20px;
-}
-
-.cart-item-price {
-    font-size: 16px;
-    font-weight: bold;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .cart-controls {
@@ -78,9 +56,9 @@
 }
 
 .quantity-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
     background: #007bff;
     color: white;
     border: none;
@@ -92,15 +70,10 @@
     background: #0056b3;
 }
 
-.quantity-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
 .quantity-input {
-    width: 40px;
+    width: 35px;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -126,7 +99,7 @@
 }
 
 .cart-total {
-    text-align: right;
+    text-align: center;
     font-weight: bold;
     font-size: 18px;
     margin-top: 15px;
@@ -153,4 +126,38 @@
 .clear-cart-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
+}
+
+/* Mobile Optimization */
+@media (max-width: 600px) {
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .cart-item-right {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .quantity-input {
+        width: 30px;
+        font-size: 12px;
+    }
+
+    .quantity-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .cart-item-total {
+        text-align: left;
+        width: 100%;
+    }
+
+    .cart-total {
+        text-align: center;
+    }
 }
