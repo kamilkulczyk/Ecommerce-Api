@@ -23,21 +23,21 @@ const Products = () => {
     fetchStatuses();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/products`;
+      const res = await axios.get(url, {
+        params: user?.is_admin ? { status_id: selectedStatus } : {},
+        withCredentials: true,
+      });
+
+      setProducts(res.data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const url = `${import.meta.env.VITE_API_URL}/products`;
-        const res = await axios.get(url, {
-          params: user?.is_admin ? { status_id: selectedStatus } : {},
-          withCredentials: true,
-        });
-
-        setProducts(res.data);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    };
-
     fetchProducts();
   }, [selectedStatus, user?.is_admin]);
 
@@ -51,7 +51,7 @@ const Products = () => {
           <select id="status" value={selectedStatus} onChange={(e) => setSelectedStatus(Number(e.target.value))}>
             {statuses.map((status) => (
               <option key={status.id} value={status.id}>
-                {status.status}
+                {status.name}
               </option>
             ))}
           </select>
