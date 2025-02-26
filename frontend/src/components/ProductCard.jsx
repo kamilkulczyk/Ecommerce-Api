@@ -10,6 +10,14 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
   const cartItem = cart.find((item) => item.id === product.id);
   const maxAvailable = product.stock - (cartItem ? cartItem.quantity : 0);
 
+  const [quantity, setQuantity] = useState(1);
+
+  const handleQuantityChange = (e) => {
+    let value = parseInt(e.target.value, 10) || 1;
+    value = Math.max(1, Math.min(value, maxAvailable));
+    setQuantity(value);
+  };
+
   const handleStatusChange = async (newStatusId) => {
     try {
       await axios.patch(
@@ -31,7 +39,7 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
       <p>📦 In Stock: {product.stock}</p>
       <p>Status: {product.status_name}</p>
 
-      {user?.is_admin && ( // Show dropdown only for admins
+      {user?.is_admin && (
         <select value={selectedStatus} onChange={(e) => handleStatusChange(e.target.value)}>
           {statuses.map((status) => (
             <option key={status.id} value={status.id}>
@@ -43,13 +51,14 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
 
       <input
         type="number"
-        value={1}
+        value={quantity}
         min="1"
         max={maxAvailable}
+        onChange={handleQuantityChange}
         disabled={maxAvailable === 0}
       />
 
-      <button onClick={() => addToCart(product, 1)} disabled={maxAvailable === 0}>
+      <button onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
         Add to Cart
       </button>
     </div>
