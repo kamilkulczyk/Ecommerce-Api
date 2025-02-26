@@ -10,23 +10,7 @@ const Products = () => {
   const [statuses, setStatuses] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(2);
 
-  const fetchProducts = async () => {
-    try {
-      const url = `${import.meta.env.VITE_API_URL}/products`;
-      const res = await axios.get(url, {
-        params: user?.is_admin ? { status_id: selectedStatus } : {},
-        withCredentials: true,
-      });
-
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProducts();
-
     const fetchStatuses = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`);
@@ -37,19 +21,37 @@ const Products = () => {
     };
 
     fetchStatuses();
-  }, [selectedStatus]);
+  }, []);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const url = `${import.meta.env.VITE_API_URL}/products`;
+        const res = await axios.get(url, {
+          params: user?.is_admin ? { status_id: selectedStatus } : {},
+          withCredentials: true,
+        });
+
+        setProducts(res.data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedStatus, user?.is_admin]);
 
   return (
     <div className="page-container">
       <h2>Products</h2>
 
-      {user?.is_admin && (
+      {user?.is_admin && statuses.length > 0 && (
         <div className="status-filter">
           <label htmlFor="status">Filter by Status:</label>
           <select id="status" value={selectedStatus} onChange={(e) => setSelectedStatus(Number(e.target.value))}>
             {statuses.map((status) => (
               <option key={status.id} value={status.id}>
-                {status.name}
+                {status.status}
               </option>
             ))}
           </select>
@@ -57,7 +59,7 @@ const Products = () => {
       )}
 
       <div className="products-container">
-        {Array.isArray(products) && products.length > 0 ? (
+        {products.length > 0 ? (
           products.map((product) => (
             <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
           ))
