@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+import "./ProductCard.css"
 
 const ProductCard = ({ product, statuses, fetchProducts }) => {
   const { cart, addToCart } = useCart();
@@ -32,6 +33,7 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
 
   return (
     <div className="product-card">
+      <img src={product.images?.[0] || "placeholder.jpg"} alt={product.name} />
       <h3 className="product-title">
         <Link to={`/products/${product.id}`} className="product-link">
           {product.name}
