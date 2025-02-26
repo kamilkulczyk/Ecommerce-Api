@@ -12,9 +12,13 @@ const Products = () => {
 
   const fetchProducts = async (status_id = 2) => {
     try {
+      const headers = token
+        ? { Authorization: `Bearer ${token}` }
+        : {};
       const url = `${import.meta.env.VITE_API_URL}/products`;
       const res = await axios.get(url, {
         params: user?.is_admin ? { status_id } : {},
+        headers,
         withCredentials: true,
       });
 
@@ -32,11 +36,11 @@ const Products = () => {
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const headers = token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            token
         });
         setStatuses(res.data);
       } catch (error) {
