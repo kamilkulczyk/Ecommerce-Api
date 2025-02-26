@@ -56,8 +56,13 @@ func JWTMiddleware() fiber.Handler {
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
 
-		isAdmin, ok := claims["is_admin"].(bool)
-		if !ok {
+		isAdmin := false
+		switch v := claims["is_admin"].(type) {
+		case bool:
+			isAdmin = v
+		case float64:
+			isAdmin = v == 1
+		default:
 			fmt.Println("ERROR: is_admin missing or invalid in claims:", claims)
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
@@ -69,3 +74,4 @@ func JWTMiddleware() fiber.Handler {
 		return c.Next()
 	}
 }
+
