@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const ProductCard = ({ product, statuses, fetchProducts }) => {
@@ -34,10 +35,11 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
 
   return (
     <div className="product-card">
-      <h3>{product.name}</h3>
+      <h3>
+        <Link to={`/products/${product.id}`}>{product.name}</Link>
+      </h3>
       <p>💰 ${product.price}</p>
       <p>📦 In Stock: {product.stock}</p>
-      <p>Status: {product.status_name}</p>
 
       {user?.is_admin && (
         <select value={selectedStatus} onChange={(e) => handleStatusChange(e.target.value)}>

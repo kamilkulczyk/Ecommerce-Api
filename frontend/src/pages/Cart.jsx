@@ -1,6 +1,7 @@
 import { CartContext } from "../context/CartContext";
 import { useContext } from "react";
-import { FaTrash } from "react-icons/fa"; // Import trash icon
+import { FaTrash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import "./Cart.css";
 
 const Cart = () => {
@@ -19,15 +20,15 @@ const Cart = () => {
         <div className="cart-items">
           {cart.map((item) => (
             <div key={item.id} className="cart-item">
-              {/* Left: Product Image & Details */}
               <div className="cart-item-left">
                 {item.image && <img src={item.image} alt={item.name} className="cart-item-image" />}
                 <div className="cart-item-details">
-                  <h3 className="cart-item-name">{item.name}</h3>
+                  <h3 className="cart-item-name">
+                    <Link to={`/products/${item.id}`}>{item.name}</Link>
+                  </h3>
                 </div>
               </div>
 
-              {/* Right: Price, Quantity, and Remove */}
               <div className="cart-item-right">
                 <p className="cart-item-price">{item.price.toFixed(2)} zł</p>
 
@@ -58,12 +59,10 @@ const Cart = () => {
             </div>
           ))}
 
-          {/* Cart Total */}
           <div className="cart-total">
             <strong>Total: {calculateTotal()} zł</strong>
           </div>
 
-          {/* Clear Cart Button */}
           <button className="clear-cart-btn" onClick={clearCart}>Clear Cart</button>
         </div>
       )}

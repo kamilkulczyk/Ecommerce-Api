@@ -8,6 +8,7 @@ import Cart from "./pages/Cart";
 import { CartProvider } from "./context/CartContext";
 import AddProduct from "./pages/AddProduct";
 import FloatingAddButton from "./components/FloatingAddButton";
+import ProductPage from "./pages/ProductPage";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/products/:id" element={<ProductPage />} />
         </Routes>
         <FloatingAddButton />
       </Router>
