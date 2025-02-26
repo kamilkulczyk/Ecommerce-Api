@@ -34,9 +34,6 @@ func Register(c *fiber.Ctx) error {
   if err := c.BodyParser(&user); err != nil {
     return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
   }
-  fmt.Println("DEBUG: user Password:", user.Password)
-  fmt.Println("DEBUG: user user:", user.Username)
-  fmt.Println("DEBUG: user email:", user.Email)
   hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
@@ -80,10 +77,6 @@ func Login(c *fiber.Ctx) error {
         fmt.Println("DEBUG: No user found for email:", req.Email)
         return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
     }
-
-    fmt.Println("DEBUG: User found:", user.Email)
-    fmt.Println("DEBUG: Provided password:", req.Password, "| Length:", len(req.Password))
-    fmt.Println("DEBUG: Stored hash:", storedPassword, "| Length:", len(storedPassword))
 
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.Password)); err != nil {
         fmt.Println("DEBUG: Password does NOT match:", err)
