@@ -26,7 +26,6 @@ func init() {
   }
 }
 
-// ✅ Register a new user
 func Register(c *fiber.Ctx) error {
   conn := config.GetDB()
 
@@ -35,14 +34,12 @@ func Register(c *fiber.Ctx) error {
     return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
   }
 
-  // Hash the password before saving
   hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
   }
   user.Password = string(hashedPassword)
 
-  // Set the current time as created_at
   createdAt := time.Now()
 
   _, err = conn.Exec(context.Background(),
@@ -57,8 +54,6 @@ func Register(c *fiber.Ctx) error {
   return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
 
-// ✅ Login user and return JWT token
-// Login handler
 func Login(c *fiber.Ctx) error {
     var req struct {
         Email    string `json:"email"`
@@ -69,30 +64,29 @@ func Login(c *fiber.Ctx) error {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
     }
 
-    var userID int
-    var hashedPassword string
-    var username string
-    var isAdmin bool
+    var user models.User
 
     // Fetch user from DB
-    err := config.GetDB().QueryRow(context.Background(),
-        "SELECT id, username, password, is_admin FROM users WHERE email = $1", req.Email).
-        Scan(&userID, &username, &hashedPassword, &isAdmin)
+    err := conn.QueryRow(context.Background(),
+      "SELECT id, username, email, password, is_admin FROM users WHERE email = $1", req.Email).
+      Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.IsAdmin)
 
     if err != nil {
-        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+      if err == pgx.ErrNoRows {
+          return c.Status(401).JSON(fiber.Map{"error": "User not found"})
+      }
+      return c.Status(500).JSON(fiber.Map{"error": "Database error"})
     }
-
-    // Compare hashed passwords (assuming you hash passwords)
-    if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password)); err != nil {
-        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+  
+    if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+      return c.Status(401).JSON(fiber.Map{"error": "Incorrect password"})
     }
 
     // Create JWT token
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-        "user_id": userID,
-        "is_admin": isAdmin, // Include admin status in token
-        "exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24h
+        "user_id":    user.ID,
+        "is_admin":   user.IsAdmin,
+        "exp":        time.Now().Add(time.Hour * 24).Unix(),
     })
 
     tokenString, err := token.SignedString([]byte(secretKey))
@@ -103,10 +97,10 @@ func Login(c *fiber.Ctx) error {
     return c.JSON(fiber.Map{
         "token": tokenString,
         "user": fiber.Map{
-            "id":       userID,
+            "id":       user.ID,
             "email":    req.Email,
-            "username": username,
-            "is_admin": isAdmin,
+            "username": user.Username,
+            "is_admin": user.IsAdmin,
         },
     })
 }
