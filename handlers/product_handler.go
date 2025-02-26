@@ -28,11 +28,13 @@ func GetProducts(c *fiber.Ctx) error {
 	}
 
 	statusFilter := c.QueryInt("status_id", 2)
-	if !isAdmin {
-		statusFilter = 2 // Non-admins only see approved products
-	}
+	fmt.Println("DEBUG: requested status:", statusFilter)
+	fmt.Println("DEBUG: isAdmin:", isAdmin)
 
-	fmt.Println("DEBUG: isAdmin:", isAdmin, " | statusFilter:", statusFilter)
+	// ✅ Guests only see approved products
+	if !isAdmin {
+		statusFilter = 2
+	}
 
 	rows, err := conn.Query(context.Background(), `
 		SELECT p.id, p.name, p.price, p.stock, p.status_id,
@@ -66,13 +68,14 @@ func GetProducts(c *fiber.Ctx) error {
 		products = append(products, product)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err {
 		log.Println("Rows iteration error:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to process products"})
 	}
 
 	return c.JSON(products)
 }
+
 
 
 func CreateProduct(c *fiber.Ctx) error {
