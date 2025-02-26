@@ -20,16 +20,19 @@ func GetProducts(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-	isAdminValue := c.Locals("is_admin")
-	isAdmin, ok := isAdminValue.(bool)
+	isAdmin := false
+	if isAdminValue := c.Locals("is_admin"); isAdminValue != nil {
+		if val, ok := isAdminValue.(bool); ok {
+			isAdmin = val
+		}
+	}
 
 	statusFilter := c.QueryInt("status_id", 2)
-	fmt.Println("DEBUG: requested status:", statusFilter)
-	fmt.Println("DEBUG: ok:", ok)
-	fmt.Println("DEBUG: isAdmin:", isAdmin)
-	if !ok || !isAdmin {
+	if !isAdmin {
 		statusFilter = 2 // Non-admins only see approved products
 	}
+
+	fmt.Println("DEBUG: isAdmin:", isAdmin, " | statusFilter:", statusFilter)
 
 	rows, err := conn.Query(context.Background(), `
 		SELECT p.id, p.name, p.price, p.stock, p.status_id,
