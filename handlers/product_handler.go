@@ -147,7 +147,7 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 		if err := c.BodyParser(&body); err != nil {
 				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 		}
-
+		fmt.Println(body.StatusID,", ", id)
 		_, err = conn.Exec(context.Background(),
 				"UPDATE products SET status_id=$1 WHERE id=$2", body.StatusID, id)
 
