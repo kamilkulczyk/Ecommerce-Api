@@ -1,5 +1,6 @@
 .add-product-container {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     background: #fff;
     padding: 2rem;
     border-radius: 10px;
@@ -7,55 +8,83 @@
     text-align: center;
     font-family: Arial, sans-serif;
     margin: 20px auto;
-  }
-  
-  .add-product-container h2 {
+    box-sizing: border-box;
+}
+
+.add-product-container h2 {
     font-size: 24px;
     margin-bottom: 1rem;
-  }
-  
-  .add-product-container form {
+}
+
+.add-product-container form {
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-  
-  .add-product-container input,
-  .add-product-container textarea {
+}
+
+.add-product-container input,
+.add-product-container textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
-  }
-  
-  .add-product-container textarea {
+    box-sizing: border-box;
+}
+
+.add-product-container textarea {
     resize: vertical;
     min-height: 80px;
-  }
-  
-  .add-product-container input[type="file"] {
-    border: none;
-    padding: 5px;
-  }
-  
-  .add-product-container button {
+}
+
+.add-product-container button {
     background: #007bff;
     color: white;
-    padding: 10px;
+    padding: 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s ease;
-  }
-  
-  .add-product-container button:hover {
+    width: 100%;
+}
+
+.add-product-container button:hover {
     background: #0056b3;
-  }
-  
-  .add-product-container button:disabled {
+}
+
+.add-product-container button:disabled {
     background: #ccc;
     cursor: not-allowed;
-  }
-  
+}
+
+.image-urls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.image-urls input {
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .add-product-container {
+        padding: 1.5rem;
+    }
+
+    .add-product-container h2 {
+        font-size: 20px;
+    }
+
+    .add-product-container input,
+    .add-product-container textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .add-product-container button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
