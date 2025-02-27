@@ -18,8 +18,8 @@ func main() {
 
   // Enable CORS
   app.Use(cors.New(cors.Config{
-    AllowOrigins: "https://ecommerce-kulczyk.netlify.app", // Your frontend URL
-    AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+    AllowOrigins: "https://ecommerce-kulczyk.netlify.app",
+    AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
     AllowHeaders: "Origin, Content-Type, Accept, Authorization",
     AllowCredentials: true,
   }))

@@ -56,8 +56,14 @@ const AddProduct = () => {
       <h2>Add a New Product</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required />
-        <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(parseFloat(e.target.value) || 0)} required />
-        <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(parseFloat(e.target.value) || 0)} required />
+        <input type="number" placeholder="Price" value={price} onChange={(e) => {
+          const value = parseFloat(e.target.value);
+          setPrice(!isNaN(value) && value >= 0 ? value : "");
+        }} required />
+        <input type="number" placeholder="Stock" value={stock} onChange={(e) => {
+          const value = parseFloat(e.target.value);
+          setStock(!isNaN(value) && value >= 0 ? value : "");
+        }} required />
         <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
 
         <div className="image-urls">
