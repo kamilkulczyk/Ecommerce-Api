@@ -61,7 +61,7 @@ const Products = () => {
     <div className="page-container">
       <h2>Products</h2>
 
-      {user?.is_admin && statuses.length > 0 && (
+      {user?.is_admin && statuses?.length > 0 && (
         <div className="status-filter">
           <label htmlFor="status">Filter by Status:</label>
           <select id="status" value={selectedStatus} onChange={handleStatusChange}>
@@ -75,7 +75,7 @@ const Products = () => {
       )}
 
       <div className="products-container">
-        {products.length > 0 ? (
+        {products?.length > 0 ? (
           products.map((product) => (
             <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
           ))

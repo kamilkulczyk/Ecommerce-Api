@@ -1,11 +1,13 @@
 .auth-container {
-  width: 350px; /* Fixed width for consistency */
+  width: 100%;
+  max-width: 350px;
   margin: 50px auto;
   padding: 20px;
   background: white;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .auth-container h2 {
@@ -20,21 +22,24 @@
 }
 
 .auth-container input {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-container button {
   background: #007bff;
   color: white;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   transition: background 0.3s ease;
+  width: 100%;
 }
 
 .auth-container button:hover {
@@ -46,9 +51,25 @@
   color: #007bff;
   font-weight: bold;
   text-decoration: none;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .register-button:hover {
-  text-decoration: none;
+  text-decoration: underline;
+}
+
+@media (max-width: 400px) {
+  .auth-container {
+    padding: 15px;
+  }
+
+  .auth-container h2 {
+    font-size: 20px;
+  }
+
+  .auth-container input, 
+  .auth-container button {
+    font-size: 14px;
+    padding: 10px;
+  }
 }
