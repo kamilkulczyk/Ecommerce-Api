@@ -6,8 +6,8 @@ import "./AddProduct.css";
 const AddProduct = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [stock, setStock] = useState(0);
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrls, setImageUrls] = useState([""]);
   const [loading, setLoading] = useState(false);
