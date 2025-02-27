@@ -133,25 +133,26 @@ func CreateProduct(c *fiber.Ctx) error {
 }
 
 func UpdateProductStatus(c *fiber.Ctx) error {
-		db := config.GetDB()
+		fmt.Println("DEBUG: UpdateProductStatus called")
+	  db := config.GetDB()
 		conn, err := db.Acquire(context.Background())
 		if err != nil {
 			log.Println("Failed to acquire DB connection:", err)
 			return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
 		}
 		defer conn.Release()
-
-		if err := c.BodyParser(&body); err != nil {
-			fmt.Println("❌ Body parsing error:", err)
-			fmt.Println("📥 Raw request body:", string(c.Body()))
-			return c.Status(400).JSON(fiber.Map{"error": "Invalid request format"})
-		}
-
-		fmt.Println("✅ Parsed StatusID:", body.StatusID)
-		fmt.Println("🆔 Product ID:", id)
 	
 		id := c.Params("id")
 		var body struct { StatusID int `json:"status_id"` }
+
+	if err := c.BodyParser(&body); err != nil {
+		fmt.Println("❌ Body parsing error:", err)
+		fmt.Println("📥 Raw request body:", string(c.Body()))
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request format"})
+	}
+
+	fmt.Println("✅ Parsed StatusID:", body.StatusID)
+	fmt.Println("🆔 Product ID:", id)
 
 		if err := c.BodyParser(&body); err != nil {
 				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
