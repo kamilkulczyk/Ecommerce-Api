@@ -140,6 +140,15 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 			return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
 		}
 		defer conn.Release()
+
+		if err := c.BodyParser(&body); err != nil {
+			fmt.Println("❌ Body parsing error:", err)
+			fmt.Println("📥 Raw request body:", string(c.Body()))
+			return c.Status(400).JSON(fiber.Map{"error": "Invalid request format"})
+		}
+
+		fmt.Println("✅ Parsed StatusID:", body.StatusID)
+		fmt.Println("🆔 Product ID:", id)
 	
 		id := c.Params("id")
 		var body struct { StatusID int `json:"status_id"` }
@@ -147,7 +156,7 @@ func UpdateProductStatus(c *fiber.Ctx) error {
 		if err := c.BodyParser(&body); err != nil {
 				return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 		}
-		fmt.Println(body.StatusID,", ", id)
+	
 		_, err = conn.Exec(context.Background(),
 				"UPDATE products SET status_id=$1 WHERE id=$2", body.StatusID, id)
 
