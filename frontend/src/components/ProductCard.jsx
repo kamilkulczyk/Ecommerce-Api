@@ -21,7 +21,7 @@ const ProductCard = ({ product, statuses, fetchProducts }) => {
     try {
       await axios.patch(
         `${import.meta.env.VITE_API_URL}/products/${product.id}/status`,
-        { status_id: newStatusId },
+        { status_id: Number(newStatusId) },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       setSelectedStatus(newStatusId);
