@@ -99,11 +99,11 @@ func Login(c *fiber.Ctx) error {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
 
-    if failedAttempts[req.Email] >= 3 {
-        if err := verifyAltcha(req.Captcha); err != nil {
-            return c.Status(400).JSON(fiber.Map{"error": "CAPTCHA verification failed"})
-        }
-    }
+    // if failedAttempts[req.Email] >= 3 {
+    //     if err := verifyAltcha(req.Captcha); err != nil {
+    //         return c.Status(400).JSON(fiber.Map{"error": "CAPTCHA verification failed"})
+    //     }
+    // }
 
     var user models.User
     var storedPassword string

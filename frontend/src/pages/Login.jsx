@@ -80,7 +80,7 @@ const Login = () => {
         />
         {failedAttempts >= MAX_FAILED_ATTEMPTS  && (
           <altcha-widget
-            challengeurl="https://api.altcha.io/v1/challenge"
+            challengeurl="https://api.altcha.io/v1/challenge?apiKey=ckey_01752f90d0e3ee96f16c0be82632"
             onverified={(e) => setCaptchaToken(e.detail.token)}
           ></altcha-widget>
         )}
