@@ -5,6 +5,12 @@ import (
   "log"
   "os"
   "time"
+  "fmt"
+  "bytes"
+  "encoding/json"
+  "errors"
+  "io/ioutil"
+  "net/http"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
@@ -93,8 +99,8 @@ func Login(c *fiber.Ctx) error {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
 
-    if failedAttempts[body.Email] >= 3 {
-        if err := verifyAltcha(body.Captcha); err != nil {
+    if failedAttempts[req.Email] >= 3 {
+        if err := verifyAltcha(req.Captcha); err != nil {
             return c.Status(400).JSON(fiber.Map{"error": "CAPTCHA verification failed"})
         }
     }
@@ -125,7 +131,7 @@ func Login(c *fiber.Ctx) error {
         return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
     }
 
-    delete(failedAttempts, body.Email)
+    delete(failedAttempts, req.Email)
 
     return c.JSON(fiber.Map{
         "token": tokenString,
