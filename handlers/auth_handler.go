@@ -53,16 +53,50 @@ func Register(c *fiber.Ctx) error {
   return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
 
+type AltchaResponse struct {
+    Success bool `json:"success"`
+}
+
+func verifyAltcha(token string) error {
+    altchaURL := "https://altcha.org/api/siteverify"
+    secretKey := os.Getenv("ALTCHA_SECRET_KEY")
+
+    reqBody := fmt.Sprintf(`{"secret": "%s", "response": "%s"}`, secretKey, token)
+    resp, err := http.Post(altchaURL, "application/json", bytes.NewBuffer([]byte(reqBody)))
+    if err != nil {
+        return errors.New("failed to reach CAPTCHA server")
+    }
+    defer resp.Body.Close()
+
+    body, _ := ioutil.ReadAll(resp.Body)
+    var altchaResp AltchaResponse
+    json.Unmarshal(body, &altchaResp)
+
+    if !altchaResp.Success {
+        return errors.New("CAPTCHA verification failed")
+    }
+    return nil
+}
+
+var failedAttempts = make(map[string]int)
+
 func Login(c *fiber.Ctx) error {
     conn := config.GetDB()
 
     var req struct {
         Email    string `json:"email"`
         Password string `json:"password"`
+        Captcha  string `json:"captcha"`
     }
 
     if err := c.BodyParser(&req); err != nil {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+    }
+
+    if failedAttempts[body.Email] >= 3 {
+        if err := verifyAltcha(body.Captcha); err != nil {
+            return c.Status(400).JSON(fiber.Map{"error": "CAPTCHA verification failed"})
+        }
     }
 
     var user models.User
@@ -90,6 +124,8 @@ func Login(c *fiber.Ctx) error {
     if err != nil {
         return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
     }
+
+    delete(failedAttempts, body.Email)
 
     return c.JSON(fiber.Map{
         "token": tokenString,
