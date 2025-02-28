@@ -14,6 +14,12 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Load failed attempts from local storage when page loads
+    const storedAttempts = localStorage.getItem("failedAttempts");
+    if (storedAttempts) setFailedAttempts(parseInt(storedAttempts, 10));
+  }, []);
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -28,11 +34,15 @@ const Login = () => {
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { 
         email,
         password,
-        captcha: captchaValue,
+        captcha: failedAttempts >= 3 captchaValue : undefined,
       });
 
       if (res.data?.user && res.data?.token) {
         login(res.data.user, res.data.token);
+
+        localStorage.removeItem("failedAttempts");
+        setFailedAttempts(0);
+        
         alert("Login successful!");
         navigate("/products");
       } else {
@@ -40,7 +50,9 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
-      setFailedAttempts((prev) => prev + 1);
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      localStorage.setItem("failedAttempts", newAttempts);
       alert(error.response?.data?.message || "Login failed, please try again.");
     } finally {
       setLoading(false);
