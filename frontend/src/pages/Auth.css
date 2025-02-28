@@ -58,6 +58,17 @@
   text-decoration: underline;
 }
 
+.forgot-button {
+  display: inline-block;
+  color: #007bff;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.forgot-button:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 400px) {
   .auth-container {
     padding: 15px;

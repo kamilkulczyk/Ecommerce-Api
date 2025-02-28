@@ -9,6 +9,8 @@ import { CartProvider } from "./context/CartContext";
 import AddProduct from "./pages/AddProduct";
 import FloatingAddButton from "./components/FloatingAddButton";
 import ProductPage from "./pages/ProductPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   return (
@@ -24,6 +26,8 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/products/:id" element={<ProductPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
         <FloatingAddButton />
       </Router>

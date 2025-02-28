@@ -3,20 +3,33 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./Auth.css";
 import axios from "axios";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [captchaValue, setCaptchaValue] = useState(null);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // Disable button during request
+    setLoading(true);
+
+    if (failedAttempts >= 3 && !captchaValue) {
+      alert("Please complete the CAPTCHA before logging in.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { email, password });
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { 
+        email,
+        password,
+        captcha: captchaValue,
+      });
 
       if (res.data?.user && res.data?.token) {
         login(res.data.user, res.data.token);
@@ -27,9 +40,10 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
+      setFailedAttempts((prev) => prev + 1);
       alert(error.response?.data?.message || "Login failed, please try again.");
     } finally {
-      setLoading(false); // Re-enable button
+      setLoading(false);
     }
   };
 
@@ -51,10 +65,18 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        {failedAttempts >= 3 && (
+          <ReCAPTCHA sitekey="YOUR_RECAPTCHA_SITE_KEY" onChange={(value) => setCaptchaValue(value)} />
+        )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
+
+      <p>
+        <Link to="/forgot-password" className="forgot-button">Forgot Password?</Link>
+      </p>
+
       <p>Don't have an account?</p>
       <Link to="/register" className="register-button">
         Register Here
