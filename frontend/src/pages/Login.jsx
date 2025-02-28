@@ -34,7 +34,7 @@ const Login = () => {
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { 
         email,
         password,
-        captcha: failedAttempts >= 3 captchaValue : undefined,
+        captcha: failedAttempts >= 3 ? captchaValue : undefined,
       });
 
       if (res.data?.user && res.data?.token) {
