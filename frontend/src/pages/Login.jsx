@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./Auth.css";
 import axios from "axios";
-import ReCAPTCHA from "react-google-recaptcha";
+import Altcha from "altcha-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -66,7 +66,7 @@ const Login = () => {
           required
         />
         {failedAttempts >= 3 && (
-          <ReCAPTCHA sitekey="YOUR_RECAPTCHA_SITE_KEY" onChange={(value) => setCaptchaValue(value)} />
+          <Altcha sitekey="ckey_01752f90d0e3ee96f16c0be82632" onChange={(value) => setCaptchaValue(value)} />
         )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
