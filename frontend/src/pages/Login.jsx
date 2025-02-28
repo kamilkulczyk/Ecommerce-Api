@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./Auth.css";
 import axios from "axios";
-import Altcha from "altcha-react";
+import "altcha";
+
+const MAX_FAILED_ATTEMPTS = 3;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +26,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (failedAttempts >= 3 && !captchaValue) {
+    if (failedAttempts >= MAX_FAILED_ATTEMPTS  && !captchaValue) {
       alert("Please complete the CAPTCHA before logging in.");
       setLoading(false);
       return;
@@ -34,7 +36,7 @@ const Login = () => {
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { 
         email,
         password,
-        captcha: failedAttempts >= 3 ? captchaValue : undefined,
+        captcha: failedAttempts >= MAX_FAILED_ATTEMPTS  ? captchaValue : undefined,
       });
 
       if (res.data?.user && res.data?.token) {
@@ -77,8 +79,11 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {failedAttempts >= 3 && (
-          <Altcha sitekey="ckey_01752f90d0e3ee96f16c0be82632" onChange={(value) => setCaptchaValue(value)} />
+        {failedAttempts >= MAX_FAILED_ATTEMPTS  && (
+          <altcha-widget
+            challengeurl="https://api.altcha.io/v1/challenge"
+            onverified={(e) => setCaptchaToken(e.detail.token)}
+          ></altcha-widget>
         )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}

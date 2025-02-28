@@ -64,7 +64,7 @@ type AltchaResponse struct {
 }
 
 func verifyAltcha(token string) error {
-    altchaURL := "https://altcha.org/api/siteverify"
+    altchaURL := "https://api.altcha.io/v1/verify"
     secretKey := os.Getenv("ALTCHA_SECRET_KEY")
 
     reqBody := fmt.Sprintf(`{"secret": "%s", "response": "%s"}`, secretKey, token)
