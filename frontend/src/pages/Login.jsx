@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./Auth.css";
@@ -17,7 +17,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load failed attempts from local storage when page loads
     const storedAttempts = localStorage.getItem("failedAttempts");
     if (storedAttempts) setFailedAttempts(parseInt(storedAttempts, 10));
   }, []);
