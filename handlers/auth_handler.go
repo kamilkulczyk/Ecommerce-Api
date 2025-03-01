@@ -29,6 +29,10 @@ func init() {
   if secretKey == "" {
     log.Fatal("❌ JWT_SECRET is not set in environment variables")
   }
+
+  var failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
+  var recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
+  var maxFailedAttempts = 3
 }
 
 func Register(c *fiber.Ctx) error {
@@ -57,10 +61,6 @@ func Register(c *fiber.Ctx) error {
 
   return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
-
-var failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
-var recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
-var maxFailedAttempts = 3
 
 func verifyRecaptcha(token string) (bool, error) {
     fmt.Println("verify. Secret: ", recaptchaSecretKey)
