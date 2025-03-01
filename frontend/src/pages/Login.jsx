@@ -36,7 +36,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    console.log("VITE_RECAPTCHA_SITE_KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
     if (failedAttempts >= MAX_FAILED_ATTEMPTS && !captchaValue) {
       alert("Please complete the CAPTCHA before logging in.");
       setLoading(false);
@@ -44,7 +44,7 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", {
+      const res = await axios.post(import.meta.env.VITE_RECAPTCHA_SITE_KEY + "/login", {
         email,
         password,
         captcha: failedAttempts >= MAX_FAILED_ATTEMPTS ? captchaValue : undefined,
