@@ -19,7 +19,12 @@ import (
   "github.com/kamilkulczyk/Ecommerce-Api/models"
 )
 
-var secretKey string
+var (
+  secretKey          string
+  failedAttempts     map[string]int
+  recaptchaSecretKey string
+  maxFailedAttempts  int
+)
 
 func init() {
   // Load environment variables from .env file
@@ -30,9 +35,9 @@ func init() {
     log.Fatal("❌ JWT_SECRET is not set in environment variables")
   }
 
-  var failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
-  var recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
-  var maxFailedAttempts = 3
+  failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
+  recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
+  maxFailedAttempts = 3
 }
 
 func Register(c *fiber.Ctx) error {
@@ -61,6 +66,7 @@ func Register(c *fiber.Ctx) error {
 
   return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
+
 
 func verifyRecaptcha(token string) (bool, error) {
     fmt.Println("verify. Secret: ", recaptchaSecretKey)
