@@ -95,6 +95,12 @@ func verifyRecaptcha(token string) (bool, error) {
 }
 
 func Login(c *fiber.Ctx) error {
+    key, exists := os.LookupEnv("RECAPTCHA_SECRET_KEY")
+    if !exists {
+        fmt.Println("RECAPTCHA_SECRET_KEY is not set")
+    } else {
+        fmt.Println("RECAPTCHA_SECRET_KEY is set", recaptchaSecretKey)
+    }
     conn := config.GetDB()
 
     var req struct {
