@@ -7,6 +7,7 @@ import (
   "time"
   "encoding/json"
   "net/http"
+  "net/url"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
@@ -71,7 +72,7 @@ func verifyRecaptcha(token string) (bool, error) {
     data.Set("response", token)
 
     resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify", data)
-    
+
     if err != nil {
             return false, err
     }
