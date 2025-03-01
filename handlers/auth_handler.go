@@ -5,19 +5,16 @@ import (
   "log"
   "os"
   "time"
-  "fmt"
-  "bytes"
   "encoding/json"
-  "errors"
-  "io/ioutil"
   "net/http"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
-  "github.com/kamilkulczyk/Ecommerce-Api/config"
-  "github.com/kamilkulczyk/Ecommerce-Api/models"
   "golang.org/x/crypto/bcrypt"
   "github.com/joho/godotenv"
+
+  "github.com/kamilkulczyk/Ecommerce-Api/config"
+  "github.com/kamilkulczyk/Ecommerce-Api/models"
 )
 
 var secretKey string
@@ -59,32 +56,38 @@ func Register(c *fiber.Ctx) error {
   return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
 
-type AltchaResponse struct {
-    Success bool `json:"success"`
-}
+var failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
+var recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
+var maxFailedAttempts = 3
 
-func verifyAltcha(token string) error {
-    altchaURL := "https://api.altcha.io/v1/verify"
-    secretKey := os.Getenv("ALTCHA_SECRET_KEY")
+func verifyRecaptcha(token string) (bool, error) {
+    if recaptchaSecretKey == "" {
+            return false, fiber.NewError(fiber.StatusInternalServerError, "Recaptcha secret key not set")
+    }
 
-    reqBody := fmt.Sprintf(`{"secret": "%s", "response": "%s"}`, secretKey, token)
-    resp, err := http.Post(altchaURL, "application/json", bytes.NewBuffer([]byte(reqBody)))
+    client := &http.Client{}
+    resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify",
+            fiber.Map{
+                    "secret":   recaptchaSecretKey,
+                    "response": token,
+            })
     if err != nil {
-        return errors.New("failed to reach CAPTCHA server")
+            return false, err
     }
     defer resp.Body.Close()
 
-    body, _ := ioutil.ReadAll(resp.Body)
-    var altchaResp AltchaResponse
-    json.Unmarshal(body, &altchaResp)
-
-    if !altchaResp.Success {
-        return errors.New("CAPTCHA verification failed")
+    var result map[string]interface{}
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+            return false, err
     }
-    return nil
-}
 
-var failedAttempts = make(map[string]int)
+    success, ok := result["success"].(bool)
+    if !ok {
+            return false, fiber.NewError(fiber.StatusInternalServerError, "Recaptcha response invalid")
+    }
+
+    return success, nil
+}
 
 func Login(c *fiber.Ctx) error {
     conn := config.GetDB()
@@ -99,12 +102,6 @@ func Login(c *fiber.Ctx) error {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
 
-    // if failedAttempts[req.Email] >= 3 {
-    //     if err := verifyAltcha(req.Captcha); err != nil {
-    //         return c.Status(400).JSON(fiber.Map{"error": "CAPTCHA verification failed"})
-    //     }
-    // }
-
     var user models.User
     var storedPassword string
 
@@ -113,13 +110,35 @@ func Login(c *fiber.Ctx) error {
         Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin)
 
     if err != nil {
-        return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+        failedAttempts[req.Email]++
+        return c.Status(401).JSON(fiber.Map{
+          "error":          "Invalid credentials",
+          "failedAttempts": failedAttempts[req.Email],
+      })
     }
 
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.Password)); err != nil {
-        return c.Status(401).JSON(fiber.Map{"error": "Incorrect email or password"})
+        failedAttempts[req.Email]++
+        return c.Status(401).JSON(fiber.Map{
+          "error":          "Invalid credentials",
+          "failedAttempts": failedAttempts[req.Email],
+      })
     }
 
+    if failedAttempts[req.Email] >= maxFailedAttempts {
+        if req.Captcha == "" {
+            return c.Status(400).JSON(fiber.Map{"error": "Captcha required"})
+        }
+
+        success, err := verifyRecaptcha(req.Captcha)
+        if err != nil {
+            return c.Status(500).JSON(fiber.Map{"error": "Recaptcha verification failed"})
+        }
+
+        if !success {
+            return c.Status(400).JSON(fiber.Map{"error": "Invalid captcha"})
+        }
+    }
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "user_id":  user.ID,
         "is_admin": user.IsAdmin,

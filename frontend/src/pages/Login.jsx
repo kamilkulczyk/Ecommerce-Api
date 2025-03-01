@@ -17,9 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedAttempts = localStorage.getItem("failedAttempts");
-    if (storedAttempts) setFailedAttempts(parseInt(storedAttempts, 10));
-  }, [failedAttempts]);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,21 +38,22 @@ const Login = () => {
 
       if (res.data?.user && res.data?.token) {
         login(res.data.user, res.data.token);
-
-        localStorage.removeItem("failedAttempts");
         setFailedAttempts(0);
-
         alert("Login successful!");
         navigate("/products");
       } else {
         throw new Error("Invalid response from server.");
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || "Login failed, please try again.";
+      const newAttempts = error.response?.data?.failedAttempts;
+
+      if(newAttempts !== undefined){
+        setFailedAttempts(newAttempts);
+      }
+
       console.error("Login error:", error.response?.data || error.message);
-      const newAttempts = failedAttempts + 1;
-      setFailedAttempts(newAttempts);
-      localStorage.setItem("failedAttempts", newAttempts);
-      alert(error.response?.data?.message || "Login failed, please try again.");
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -79,7 +78,10 @@ const Login = () => {
           required
         />
         {failedAttempts >= MAX_FAILED_ATTEMPTS && (
-          <ReCAPTCHA sitekey="6LcrauYqAAAAAKtZjo-1jlAnW78Kc03F0pG8drzs" onChange={(value) => setCaptchaValue(value)} />
+          <ReCAPTCHA
+            sitekey="6LcrauYqAAAAAKtZjo-1jlAnW78Kc03F0pG8drzs"
+            onChange={(value) => setCaptchaValue(value)}
+          />
         )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
@@ -87,7 +89,9 @@ const Login = () => {
       </form>
 
       <p>
-        <Link to="/forgot-password" className="forgot-button">Forgot Password?</Link>
+        <Link to="/forgot-password" className="forgot-button">
+          Forgot Password?
+        </Link>
       </p>
 
       <p>Don't have an account?</p>

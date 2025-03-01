@@ -10,13 +10,10 @@ import (
 )
 
 func main() {
-  // Connect to DB
   config.ConnectDB()
 
-  // Initialize Fiber app
   app := fiber.New()
 
-  // Enable CORS
   app.Use(cors.New(cors.Config{
     AllowOrigins: "https://ecommerce-kulczyk.netlify.app",
     AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
@@ -24,9 +21,7 @@ func main() {
     AllowCredentials: true,
   }))
 
-  // Setup routes
   routes.SetupRoutes(app)
 
-  // Start the server
   log.Fatal(app.Listen(":3000"))
 }
