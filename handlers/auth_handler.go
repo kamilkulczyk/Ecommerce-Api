@@ -66,11 +66,12 @@ func verifyRecaptcha(token string) (bool, error) {
     }
 
     client := &http.Client{}
-    resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify",
-            fiber.Map{
-                    "secret":   recaptchaSecretKey,
-                    "response": token,
-            })
+    data := url.Values{}
+    data.Set("secret", recaptchaSecretKey)
+    data.Set("response", token)
+
+    resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify", data)
+    
     if err != nil {
             return false, err
     }
