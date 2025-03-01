@@ -79,7 +79,7 @@ const Login = () => {
           required
         />
         {failedAttempts >= MAX_FAILED_ATTEMPTS && (
-          <ReCAPTCHA sitekey="6LfxZeYqAAAAABe7WddZlOAuirV4EWWBL0hpmvgN" onChange={(value) => setCaptchaValue(value)} />
+          <ReCAPTCHA sitekey="6LcrauYqAAAAAKtZjo-1jlAnW78Kc03F0pG8drzs" onChange={(value) => setCaptchaValue(value)} />
         )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
