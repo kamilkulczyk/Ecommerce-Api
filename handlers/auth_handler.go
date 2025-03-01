@@ -63,6 +63,7 @@ var recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
 var maxFailedAttempts = 3
 
 func verifyRecaptcha(token string) (bool, error) {
+    fmt.Println("verify. Secret: ", recaptchaSecretKey)
     if recaptchaSecretKey == "" {
             return false, fiber.NewError(fiber.StatusInternalServerError, "Recaptcha secret key not set")
     }
