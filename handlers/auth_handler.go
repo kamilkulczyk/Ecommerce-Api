@@ -68,12 +68,12 @@ func verifyRecaptcha(token string) (bool, error) {
 
     client := &http.Client{}
     data := url.Values{}
-    log.Println("secret: ",recaptchaSecretKey)
+    fmt.Println("secret: ",recaptchaSecretKey)
     data.Set("secret", recaptchaSecretKey)
     data.Set("response", token)
 
     resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify", data)
-    log.Println("response ", resp)
+    fmt.Println("response ", resp)
     if err != nil {
             return false, err
     }
