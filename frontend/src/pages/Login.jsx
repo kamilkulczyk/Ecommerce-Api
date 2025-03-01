@@ -13,8 +13,23 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [captchaValue, setCaptchaValue] = useState(null);
+  const [siteKey, setSiteKey] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchReCaptchaKey = async () => {
+      try {
+        const res = await fetch("/.netlify/functions/get-recaptcha-key");
+        const data = await res.json();
+        setSiteKey(data.siteKey);
+      } catch (error) {
+        console.error("Failed to fetch ReCAPTCHA key:", error);
+      }
+    };
+
+    fetchReCaptchaKey();
+  }, []);
 
   useEffect(() => {
     const fetchFailedAttempts = async () => {
@@ -36,7 +51,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log("VITE_RECAPTCHA_SITE_KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
+
     if (failedAttempts >= MAX_FAILED_ATTEMPTS && !captchaValue) {
       alert("Please complete the CAPTCHA before logging in.");
       setLoading(false);
@@ -44,7 +59,7 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post(import.meta.env.VITE_RECAPTCHA_SITE_KEY + "/login", {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", {
         email,
         password,
         captcha: failedAttempts >= MAX_FAILED_ATTEMPTS ? captchaValue : undefined,
@@ -91,9 +106,9 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {failedAttempts >= MAX_FAILED_ATTEMPTS && (
+        {failedAttempts >= MAX_FAILED_ATTEMPTS && siteKey &&(
           <ReCAPTCHA
-            sitekey={import.meta.env.RECAPTCHA_SITE_KEY}
+            sitekey={siteKey}
             onChange={(value) => setCaptchaValue(value)}
           />
         )}
