@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./Auth.css";
 import axios from "axios";
-import "altcha";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const MAX_FAILED_ATTEMPTS = 3;
 
@@ -19,23 +19,23 @@ const Login = () => {
   useEffect(() => {
     const storedAttempts = localStorage.getItem("failedAttempts");
     if (storedAttempts) setFailedAttempts(parseInt(storedAttempts, 10));
-  }, []);
-  
+  }, [failedAttempts]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    if (failedAttempts >= MAX_FAILED_ATTEMPTS  && !captchaValue) {
+    if (failedAttempts >= MAX_FAILED_ATTEMPTS && !captchaValue) {
       alert("Please complete the CAPTCHA before logging in.");
       setLoading(false);
       return;
     }
 
     try {
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", { 
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/login", {
         email,
         password,
-        captcha: failedAttempts >= MAX_FAILED_ATTEMPTS  ? captchaValue : undefined,
+        captcha: failedAttempts >= MAX_FAILED_ATTEMPTS ? captchaValue : undefined,
       });
 
       if (res.data?.user && res.data?.token) {
@@ -43,7 +43,7 @@ const Login = () => {
 
         localStorage.removeItem("failedAttempts");
         setFailedAttempts(0);
-        
+
         alert("Login successful!");
         navigate("/products");
       } else {
@@ -78,11 +78,8 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {failedAttempts >= MAX_FAILED_ATTEMPTS  && (
-          <altcha-widget
-            challengeurl="https://api.altcha.io/v1/challenge?apiKey=ckey_01752f90d0e3ee96f16c0be82632"
-            onverified={(e) => setCaptchaToken(e.detail.token)}
-          ></altcha-widget>
+        {failedAttempts >= MAX_FAILED_ATTEMPTS && (
+          <ReCAPTCHA sitekey="6LfxZeYqAAAAABe7WddZlOAuirV4EWWBL0hpmvgN" onChange={(value) => setCaptchaValue(value)} />
         )}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
