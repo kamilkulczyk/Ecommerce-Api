@@ -99,7 +99,7 @@ func Login(c *fiber.Ctx) error {
     if !exists {
         fmt.Println("RECAPTCHA_SECRET_KEY is not set")
     } else {
-        fmt.Println("RECAPTCHA_SECRET_KEY is set", recaptchaSecretKey)
+        fmt.Println("RECAPTCHA_SECRET_KEY is set", key)
     }
     conn := config.GetDB()
 
