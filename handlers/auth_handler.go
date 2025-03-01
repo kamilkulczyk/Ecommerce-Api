@@ -131,6 +131,7 @@ func Login(c *fiber.Ctx) error {
     }
 
     if failedAttempts[req.Email] >= maxFailedAttempts {
+        fmt.Println("Captcha required, captcha value:", req.Captcha)
         if req.Captcha == "" {
             return c.Status(400).JSON(fiber.Map{"error": "Captcha required"})
         }
