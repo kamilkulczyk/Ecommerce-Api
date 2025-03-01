@@ -8,7 +8,6 @@ import (
   "encoding/json"
   "net/http"
   "net/url"
-  "fmt"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
@@ -69,19 +68,16 @@ func Register(c *fiber.Ctx) error {
 
 
 func verifyRecaptcha(token string) (bool, error) {
-    fmt.Println("verify. Secret: ", recaptchaSecretKey)
     if recaptchaSecretKey == "" {
             return false, fiber.NewError(fiber.StatusInternalServerError, "Recaptcha secret key not set")
     }
 
     client := &http.Client{}
     data := url.Values{}
-    fmt.Println("secret: ",recaptchaSecretKey)
     data.Set("secret", recaptchaSecretKey)
     data.Set("response", token)
 
     resp, err := client.PostForm("https://www.google.com/recaptcha/api/siteverify", data)
-    fmt.Println("response ", resp)
     if err != nil {
             return false, err
     }
@@ -112,12 +108,6 @@ func GetFailedAttempts(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-    key, exists := os.LookupEnv("RECAPTCHA_SECRET_KEY")
-    if !exists {
-        fmt.Println("RECAPTCHA_SECRET_KEY is not set")
-    } else {
-        fmt.Println("RECAPTCHA_SECRET_KEY is set", key)
-    }
     conn := config.GetDB()
 
     var req struct {
@@ -154,7 +144,6 @@ func Login(c *fiber.Ctx) error {
     }
 
     if failedAttempts[req.Email] >= maxFailedAttempts {
-        fmt.Println("Captcha required, captcha value:", req.Captcha)
         if req.Captcha == "" {
             return c.Status(400).JSON(fiber.Map{"error": "Captcha required"})
         }

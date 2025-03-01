@@ -93,7 +93,7 @@ const Login = () => {
         />
         {failedAttempts >= MAX_FAILED_ATTEMPTS && (
           <ReCAPTCHA
-            sitekey="6LcrauYqAAAAAKtZjo-1jlAnW78Kc03F0pG8drzs"
+            sitekey={import.meta.env.RECAPTCHA_SITE_KEY}
             onChange={(value) => setCaptchaValue(value)}
           />
         )}
