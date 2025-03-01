@@ -17,7 +17,21 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  }, []);
+    const fetchFailedAttempts = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/failed-attempts?email=${email}`
+        );
+        setFailedAttempts(res.data.failedAttempts);
+      } catch (error) {
+        console.error("Failed to fetch failed attempts:", error);
+      }
+    };
+
+    if (email) {
+      fetchFailedAttempts();
+    }
+  }, [email]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -100,6 +100,17 @@ func verifyRecaptcha(token string) (bool, error) {
     return success, nil
 }
 
+func GetFailedAttempts(c *fiber.Ctx) error {
+  email := c.Query("email") // Get email as a query parameter
+
+  if email == "" {
+          return c.Status(400).JSON(fiber.Map{"error": "Email required"})
+  }
+
+  attempts := failedAttempts[email]
+  return c.JSON(fiber.Map{"failedAttempts": attempts})
+}
+
 func Login(c *fiber.Ctx) error {
     key, exists := os.LookupEnv("RECAPTCHA_SECRET_KEY")
     if !exists {
