@@ -97,10 +97,10 @@ func verifyRecaptcha(token string) (bool, error) {
 }
 
 func GetFailedAttempts(c *fiber.Ctx) error {
-  email := c.Query("email") // Get email as a query parameter
+  email := c.Query("email")
 
   if email == "" {
-          return c.Status(400).JSON(fiber.Map{"error": "Email required"})
+      return c.Status(400).JSON(fiber.Map{"error": "Email required"})
   }
 
   attempts := failedAttempts[email]
@@ -112,7 +112,7 @@ func Login(c *fiber.Ctx) error {
 
     var req struct {
         Email    string `json:"email"`
-        Password string `json:"password"`
+        Password []int `json:"password"`
         Captcha  string `json:"captcha"`
     }
 
@@ -135,7 +135,14 @@ func Login(c *fiber.Ctx) error {
       })
     }
 
-    if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.Password)); err != nil {
+    passwordBytes := []byte(req.Password)
+    defer func() {
+        for i := range passwordBytes {
+            passwordBytes[i] = 0
+        }
+    }()
+    
+    if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), passwordBytes); err != nil {
         failedAttempts[req.Email]++
         return c.Status(401).JSON(fiber.Map{
           "error":          "Invalid credentials",
