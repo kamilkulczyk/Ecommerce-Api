@@ -39,7 +39,6 @@ const Navbar = () => {
         <Link to="/">Ecommerce</Link>
       </h1>
       <div className="nav-items">
-        <Link to="/products">Products</Link>
 
         <button className="cart-button" onClick={() => navigate("/cart")}>
           <ShoppingCart size={20} className="icon" />
