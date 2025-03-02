@@ -12,7 +12,13 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(import.meta.env.VITE_API_URL + "/register", { username, email, password });
+      const encoder = new TextEncoder();
+      const passwordBytes = encoder.encode(password);
+      await axios.post(import.meta.env.VITE_API_URL + "/register", {
+        username,
+        email,
+        password: Array.from(passwordBytes)
+      });
       alert("Registration successful! Please log in.");
       navigate("/login");
     } catch (error) {

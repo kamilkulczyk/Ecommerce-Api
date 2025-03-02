@@ -46,7 +46,22 @@ func Register(c *fiber.Ctx) error {
   if err := c.BodyParser(&user); err != nil {
     return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
   }
-  hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+  passwordBytes := make([]byte, len(user.Password))
+  for i, v := range user.Password {
+      passwordBytes[i] = byte(v)
+  }
+
+  defer func() {
+      for i := range passwordBytes {
+          passwordBytes[i] = 0
+      }
+      for i := range user.Password {
+          user.Password[i] = 0
+      }
+  }()
+
+  hashedPassword, err := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
   }
@@ -140,7 +155,6 @@ func Login(c *fiber.Ctx) error {
         passwordBytes[i] = byte(v)
     }
 
-    // Ensure password is wiped from memory before function exits
     defer func() {
         for i := range passwordBytes {
             passwordBytes[i] = 0
