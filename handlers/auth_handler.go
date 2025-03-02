@@ -135,13 +135,21 @@ func Login(c *fiber.Ctx) error {
       })
     }
 
-    passwordBytes := []byte(req.Password)
+    passwordBytes := make([]byte, len(req.Password))
+    for i, v := range req.Password {
+        passwordBytes[i] = byte(v)
+    }
+
+    // Ensure password is wiped from memory before function exits
     defer func() {
         for i := range passwordBytes {
             passwordBytes[i] = 0
         }
+        for i := range req.Password {
+            req.Password[i] = 0
+        }
     }()
-    
+
     if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), passwordBytes); err != nil {
         failedAttempts[req.Email]++
         return c.Status(401).JSON(fiber.Map{
