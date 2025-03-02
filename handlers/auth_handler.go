@@ -8,6 +8,7 @@ import (
   "encoding/json"
   "net/http"
   "net/url"
+  "errors"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
@@ -41,6 +42,12 @@ func init() {
 
 func Register(c *fiber.Ctx) error {
   db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
 
   var user models.User
   if err := c.BodyParser(&user); err != nil {
@@ -68,7 +75,7 @@ func Register(c *fiber.Ctx) error {
 
   createdAt := time.Now()
 
-  _, err = db.Exec(context.Background(),
+  _, err = conn.Exec(context.Background(),
     "INSERT INTO users (username, email, password, created_at) VALUES ($1, $2, $3, $4)",
     user.Username, user.Email, string(hashedPassword), createdAt)
 
@@ -122,7 +129,13 @@ func GetFailedAttempts(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-    conn := config.GetDB()
+    db := config.GetDB()
+    conn, err := db.Acquire(context.Background())
+    if err != nil {
+      fmt.Println("ERROR: Failed to acquire DB connection:", err)
+      return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+    }
+    defer conn.Release()
 
     var req struct {
         Email    string `json:"email"`
@@ -209,6 +222,122 @@ func Login(c *fiber.Ctx) error {
     })
 }
 
+func ForgotPassword(c *fiber.Ctx) error {
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
 
+	var req struct {
+		Email string `json:"email"`
+	}
 
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
 
+	var userID int
+	err = conn.QueryRow(context.Background(), "SELECT id FROM users WHERE email = $1", req.Email).Scan(&userID)
+	if err == pgx.ErrNoRows {
+		return c.Status(400).JSON(fiber.Map{"error": "User not found"})
+	} else if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Database error"})
+	}
+
+	token := generateSecureToken(32)
+
+	_, err = conn.Exec(context.Background(), `
+        INSERT INTO password_resets (user_id, token, expires_at)
+        VALUES ($1, $2, $3) 
+        ON CONFLICT (user_id) 
+        DO UPDATE SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at`,
+		userID, token, time.Now().Add(1*time.Hour))
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to store reset token"})
+	}
+
+	err := sendEmail(req.Email, "Password Reset", "Here is your reset link.")
+	if err != nil {
+		return c.Status(501).JSON(fiber.Map{"error": "Email service not implemented yet"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Password reset link sent!"})
+}
+
+func ResetPassword(c *fiber.Ctx) error {
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
+
+	var req struct {
+		Token    string `json:"token"`
+		Password []int  `json:"password"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	var userID int
+	var expiresAt time.Time
+
+	err = conn.QueryRow(context.Background(),
+		"SELECT user_id, expires_at FROM password_resets WHERE token = $1", req.Token).
+		Scan(&userID, &expiresAt)
+
+	if err == pgx.ErrNoRows || time.Now().After(expiresAt) {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid or expired token"})
+	} else if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Database error"})
+	}
+
+	passwordBytes := make([]byte, len(req.Password))
+	for i, v := range req.Password {
+		passwordBytes[i] = byte(v)
+	}
+	defer func() {
+		for i := range passwordBytes {
+			passwordBytes[i] = 0
+		}
+    for i := range req.Password {
+			req.Password[i] = 0
+		}
+	}()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
+	}
+
+	_, err = conn.Exec(context.Background(),
+		"UPDATE users SET password = $1 WHERE id = $2", string(hashedPassword), userID)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update password"})
+	}
+
+	_, _ = conn.Exec(context.Background(), "DELETE FROM password_resets WHERE token = $1", req.Token)
+
+	return c.JSON(fiber.Map{"message": "Password updated successfully"})
+}
+
+func generateSecureToken(length int) string {
+	bytes := make([]byte, length)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		log.Fatal("Failed to generate secure token:", err)
+	}
+	return hex.EncodeToString(bytes)
+}
+
+func sendEmail(to, subject, body string) error {
+	return errors.New("email sending is not implemented yet")
+}
