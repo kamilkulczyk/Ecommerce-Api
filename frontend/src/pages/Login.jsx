@@ -59,10 +59,11 @@ const Login = () => {
     }
 
     try {
-      const passwordBytes = [...password].map(char => char.charCodeAt(0));
+      const encoder = new TextEncoder();
+      const passwordBytes = encoder.encode(password);
       const res = await axios.post(import.meta.env.VITE_API_URL + "/login", {
         email,
-        password: passwordBytes,
+        password: Array.from(passwordBytes),
         captcha: failedAttempts >= MAX_FAILED_ATTEMPTS ? captchaValue : undefined,
       });
 
