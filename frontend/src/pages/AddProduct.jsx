@@ -42,7 +42,7 @@ const AddProduct = () => {
       });
 
       alert("Product submitted for approval!");
-      navigate("/products");
+      navigate("/");
     } catch (error) {
       console.error("Error adding product:", error);
       alert("Failed to add product.");
@@ -68,14 +68,24 @@ const AddProduct = () => {
 
         <div className="image-urls">
           {imageUrls.map((url, index) => (
-            <input
-              key={index}
-              type="text"
-              placeholder="Image URL"
-              value={url}
-              onChange={(e) => handleImageUrlChange(index, e.target.value)}
-              required
-            />
+            <div key={index} className="image-input">
+              <input
+                key={index}
+                type="text"
+                placeholder="Image URL"
+                value={url}
+                onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                required
+              />
+              {url && url.trim() !== "" && (
+                <img
+                  src={url}
+                  alt="Preview"
+                  className="image-preview"
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              )}
+            </div>
           ))}
           <button type="button" onClick={addImageUrlField}>+ Add Another Image</button>
         </div>

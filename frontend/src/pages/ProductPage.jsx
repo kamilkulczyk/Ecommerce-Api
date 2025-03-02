@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import axios from "axios";
+import "./ProductPage.css"
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -31,7 +32,16 @@ const ProductPage = () => {
   return (
     <div className="product-page">
       <h2>{product.name}</h2>
-      <img src={product.images?.[0] || "placeholder.jpg"} alt={product.name} />
+      <div className="product-images">
+        {product.images?.length > 0 ? (
+          product.images.map((img, index) => (
+            <img key={index} src={img} alt={product.name} className="product-image" />
+          ))
+        ) : (
+          <img src="placeholder.jpg" alt="No image available" className="product-image" />
+        )}
+      </div>
+
       <p>💰 ${product.price}</p>
       <p>📦 In Stock: {product.stock}</p>
       <p>{product.description}</p>

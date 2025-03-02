@@ -71,7 +71,7 @@ const Login = () => {
         login(res.data.user, res.data.token);
         setFailedAttempts(0);
         alert("Login successful!");
-        navigate("/products");
+        navigate("/");
       } else {
         throw new Error("Invalid response from server.");
       }
