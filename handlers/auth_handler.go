@@ -65,13 +65,12 @@ func Register(c *fiber.Ctx) error {
   if err != nil {
     return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
   }
-  user.Password = string(hashedPassword)
 
   createdAt := time.Now()
 
   _, err = db.Exec(context.Background(),
     "INSERT INTO users (username, email, password, created_at) VALUES ($1, $2, $3, $4)",
-    user.Username, user.Email, user.Password, createdAt)
+    user.Username, user.Email, string(hashedPassword), createdAt)
 
   if err != nil {
     log.Println("Insert failed:", err)
