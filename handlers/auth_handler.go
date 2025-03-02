@@ -6,14 +6,18 @@ import (
   "os"
   "time"
   "encoding/json"
+  "encoding/hex"
+  "crypto/rand"
   "net/http"
   "net/url"
   "errors"
+  "fmt"
 
   "github.com/gofiber/fiber/v2"
   "github.com/golang-jwt/jwt/v5"
   "golang.org/x/crypto/bcrypt"
   "github.com/joho/godotenv"
+  "github.com/jackc/pgx/v4"
 
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/models"
@@ -150,16 +154,14 @@ func Login(c *fiber.Ctx) error {
     var user models.User
     var storedPassword string
 
-    err := conn.QueryRow(context.Background(),
+    if err := conn.QueryRow(context.Background(),
         "SELECT id, username, email, password, is_admin FROM users WHERE email = $1", req.Email).
-        Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin)
-
-    if err != nil {
-        failedAttempts[req.Email]++
-        return c.Status(401).JSON(fiber.Map{
-          "error":          "Invalid credentials",
-          "failedAttempts": failedAttempts[req.Email],
-      })
+        Scan(&user.ID, &user.Username, &user.Email, &storedPassword, &user.IsAdmin); err != nil {
+          failedAttempts[req.Email]++
+          return c.Status(401).JSON(fiber.Map{
+            "error":          "Invalid credentials",
+            "failedAttempts": failedAttempts[req.Email],
+        })
     }
 
     passwordBytes := make([]byte, len(req.Password))
@@ -260,8 +262,7 @@ func ForgotPassword(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to store reset token"})
 	}
 
-	err := sendEmail(req.Email, "Password Reset", "Here is your reset link.")
-	if err != nil {
+	if err := sendEmail(req.Email, "Password Reset", "Here is your reset link."); err != nil {
 		return c.Status(501).JSON(fiber.Map{"error": "Email service not implemented yet"})
 	}
 
