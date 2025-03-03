@@ -7,17 +7,29 @@ import { useNavigate } from "react-router-dom";
 const Profile = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
+  const [statuses, setStatuses] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
-      navigate("/login"); // Redirect if not logged in
+      navigate("/login");
     } 
-    // else {
-    //   setUser(JSON.parse(storedUser));
-    // }
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/product-statuses`, { headers });
+        setStatuses(res.data);
+      } catch (error) {
+        console.error("Failed to fetch statuses:", error);
+      }
+    };
+    fetchStatuses();
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -26,11 +38,7 @@ const Profile = () => {
         ? { Authorization: `Bearer ${token}` }
         : {};
       const url = `${import.meta.env.VITE_API_URL}/user-added-products`;
-      const res = await axios.get(url, {
-        params: { user_id: user?.id },
-        headers,
-        withCredentials: true,
-      });
+      const res = await axios.get(url, { headers, withCredentials: true });
 
       setProducts(res.data);
     } catch (error) {
@@ -49,10 +57,19 @@ const Profile = () => {
         <div>
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
+          <h2>Your products</h2>
           <div className="products-container">
             {products?.length > 0 ? (
               products.map((product) => (
-                <ProductCard key={product.id} product={product} statuses={[]} fetchProducts={fetchProducts} />
+                <ProductCard 
+                  product={product} 
+                  statuses={statuses} 
+                  fetchProducts={fetchProducts} 
+                  showStatus={true} 
+                  allowStatusChange={user?.is_admin} 
+                  allowCartActions={false} 
+                  showEditButton={true} 
+                />
               ))
             ) : (
               <p>No products available</p>

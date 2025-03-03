@@ -1,16 +1,45 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./AddProduct.css";
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+  const existingProduct = location.state?.product;
+
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrls, setImageUrls] = useState([""]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (existingProduct) {
+      setName(existingProduct.name || "");
+      setPrice(existingProduct.price || "");
+      setStock(existingProduct.stock || "");
+      setDescription(existingProduct.description || "");
+      setImageUrls(existingProduct.images?.length ? existingProduct.images : [""]);
+    } else if (id) {
+      fetchProductDetails();
+    }
+  }, [id, existingProduct]);
+
+  const fetchProductDetails = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`);
+      setName(res.data.name || "");
+      setPrice(res.data.price || "");
+      setStock(res.data.stock || "");
+      setDescription(res.data.description || "");
+      setImageUrls(res.data.images?.length ? res.data.images : [""]);
+    } catch (error) {
+      console.error("Failed to fetch product details:", error);
+    }
+  };
 
   const handleImageUrlChange = (index, value) => {
     const newImageUrls = [...imageUrls];
@@ -31,21 +60,26 @@ const AddProduct = () => {
       price,
       stock,
       description,
-      attributes: {}, 
+      attributes: {},
       images: imageUrls.filter(url => url.trim() !== ""),
     };
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(import.meta.env.VITE_API_URL + "/products", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const headers = { Authorization: `Bearer ${token}` };
 
-      alert("Product submitted for approval!");
-      navigate("/");
+      if (id) {
+        await axios.put(`${import.meta.env.VITE_API_URL}/products/${id}`, formData, { headers });
+        alert("Product updated successfully!");
+      } else {
+        await axios.post(`${import.meta.env.VITE_API_URL}/products`, formData, { headers });
+        alert("Product submitted for approval!");
+      }
+
+      navigate("/profile"); 
     } catch (error) {
-      console.error("Error adding product:", error);
-      alert("Failed to add product.");
+      console.error("Error submitting product:", error);
+      alert("Failed to save product.");
     } finally {
       setLoading(false);
     }
@@ -53,7 +87,7 @@ const AddProduct = () => {
 
   return (
     <div className="add-product-container">
-      <h2>Add a New Product</h2>
+      <h2>{id ? "Edit Product" : "Add a New Product"}</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <input type="number" placeholder="Price" value={price} onChange={(e) => {
@@ -70,14 +104,13 @@ const AddProduct = () => {
           {imageUrls.map((url, index) => (
             <div key={index} className="image-input">
               <input
-                key={index}
                 type="text"
                 placeholder="Image URL"
                 value={url}
                 onChange={(e) => handleImageUrlChange(index, e.target.value)}
                 required
               />
-              {url && url.trim() !== "" && (
+              {url.trim() !== "" && (
                 <img
                   src={url}
                   alt="Preview"
@@ -90,7 +123,9 @@ const AddProduct = () => {
           <button type="button" onClick={addImageUrlField}>+ Add Another Image</button>
         </div>
 
-        <button type="submit" disabled={loading}>{loading ? "Submitting..." : "Submit"}</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Submitting..." : id ? "Update Product" : "Submit"}
+        </button>
       </form>
     </div>
   );
