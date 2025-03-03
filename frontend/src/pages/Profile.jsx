@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import { AuthContext } from "../context/AuthContext";
