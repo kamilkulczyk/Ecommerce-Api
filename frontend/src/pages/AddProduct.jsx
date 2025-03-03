@@ -9,6 +9,7 @@ const AddProduct = () => {
   const location = useLocation();
   const existingProduct = location.state?.product;
 
+  const [product, setProduct] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
@@ -17,29 +18,24 @@ const AddProduct = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (existingProduct) {
-      setName(existingProduct.name || "");
-      setPrice(existingProduct.price || "");
-      setStock(existingProduct.stock || "");
-      setDescription(existingProduct.description || "");
-      setImageUrls(existingProduct.images?.length ? existingProduct.images : [""]);
-    } else if (id) {
-      fetchProductDetails();
-    }
-  }, [id, existingProduct]);
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`);
+        setProduct(response.data);
+        setName(product.name);
+        setPrice(product.price);
+        setStock(product.stock);
+        setDescription(product.description);
+        setImageUrls(product.images?.length ? existingProduct.images : [""]);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchProductDetails = async () => {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`);
-      setName(res.data.name || "");
-      setPrice(res.data.price || "");
-      setStock(res.data.stock || "");
-      setDescription(res.data.description || "");
-      setImageUrls(res.data.images?.length ? res.data.images : [""]);
-    } catch (error) {
-      console.error("Failed to fetch product details:", error);
-    }
-  };
+    fetchProduct();
+  }, [id]);
 
   const handleImageUrlChange = (index, value) => {
     const newImageUrls = [...imageUrls];
