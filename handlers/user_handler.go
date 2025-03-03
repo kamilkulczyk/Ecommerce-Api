@@ -4,13 +4,9 @@ import (
   "context"
   "log"
   "os"
-  "encoding/json"
-  "crypto/rand"
   "fmt"
 
   "github.com/gofiber/fiber/v2"
-  "github.com/golang-jwt/jwt/v5"
-  "golang.org/x/crypto/bcrypt"
   "github.com/joho/godotenv"
   "github.com/jackc/pgx/v4"
 
@@ -24,20 +20,6 @@ var (
   recaptchaSecretKey string
   maxFailedAttempts  int
 )
-
-func init() {
-  // Load environment variables from .env file
-  _ = godotenv.Load() // Ignore error in case it's running on a cloud platform
-
-  secretKey = os.Getenv("JWT_SECRET")
-  if secretKey == "" {
-    log.Fatal("❌ JWT_SECRET is not set in environment variables")
-  }
-
-  failedAttempts = make(map[string]int) // In-memory map (consider a database for production)
-  recaptchaSecretKey = os.Getenv("RECAPTCHA_SECRET_KEY")
-  maxFailedAttempts = 3
-}
 
 func GetUserProductsAdded(c *fiber.Ctx) error {
 	db := config.GetDB()
@@ -59,7 +41,7 @@ func GetUserProductsAdded(c *fiber.Ctx) error {
 				(SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.is_thumbnail DESC, pi.id ASC LIMIT 1) AS image
 		FROM products p
 		WHERE (p.user_id = $1)
-		`, userId)
+		`, userID)
 	
 	if err != nil {
 		log.Println("Error fetching products:", err)
