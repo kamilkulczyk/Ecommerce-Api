@@ -39,7 +39,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchProducts(selectedStatus);
+    fetchProducts();
   });
 
   return (
