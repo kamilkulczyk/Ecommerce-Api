@@ -52,7 +52,7 @@ const Profile = () => {
           <div className="products-container">
             {products?.length > 0 ? (
               products.map((product) => (
-                <ProductCard key={product.id} product={product} statuses={statuses} fetchProducts={fetchProducts} />
+                <ProductCard key={product.id} product={product} statuses={[]} fetchProducts={fetchProducts} />
               ))
             ) : (
               <p>No products available</p>
