@@ -27,7 +27,7 @@ func GetUserProductsAdded(c *fiber.Ctx) error {
 	}
 
 	rows, err := conn.Query(context.Background(), `
-		SELECT p.id, p.name, p.price, p.stock, p.status_ide,
+		SELECT p.id, p.name, p.price, p.stock, p.status_id,
 				(SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.is_thumbnail DESC, pi.id ASC LIMIT 1) AS image
 		FROM products p
 		WHERE (p.user_id = $1)
