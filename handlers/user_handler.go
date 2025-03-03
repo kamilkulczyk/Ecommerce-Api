@@ -3,22 +3,12 @@ package handlers
 import (
   "context"
   "log"
-  "os"
   "fmt"
 
   "github.com/gofiber/fiber/v2"
-  "github.com/joho/godotenv"
-  "github.com/jackc/pgx/v4"
 
   "github.com/kamilkulczyk/Ecommerce-Api/config"
   "github.com/kamilkulczyk/Ecommerce-Api/models"
-)
-
-var (
-  secretKey          string
-  failedAttempts     map[string]int
-  recaptchaSecretKey string
-  maxFailedAttempts  int
 )
 
 func GetUserProductsAdded(c *fiber.Ctx) error {
