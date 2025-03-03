@@ -44,7 +44,7 @@ const Products = () => {
           withCredentials: true,
         });
 
-        setProducts(res.data);
+        setProducts(res.data || []);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
