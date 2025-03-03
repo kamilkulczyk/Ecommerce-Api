@@ -8,9 +8,11 @@ const Products = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState(null);
+
   const [selectedStatus, setSelectedStatus] = useState(() => {
-    return localStorage.getItem("selectedStatus") || 2;
+    return Number(localStorage.getItem("selectedStatus")) || 2;
   });
+
   const [isCompact, setIsCompact] = useState(() => {
     return localStorage.getItem("isCompact") === "true";
   });
@@ -94,7 +96,7 @@ const Products = () => {
               key={product.id} 
               product={product} 
               statuses={statuses} 
-              showStatus={false} 
+              showStatus={true} 
               allowStatusChange={user?.is_admin} 
               allowCartActions={true} 
               showEditButton={false} 
