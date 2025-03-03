@@ -13,9 +13,10 @@ const Profile = () => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
       navigate("/login"); // Redirect if not logged in
-    } else {
-      setUser(JSON.parse(storedUser));
-    }
+    } 
+    // else {
+    //   setUser(JSON.parse(storedUser));
+    // }
   }, [navigate]);
 
   const fetchProducts = async () => {
