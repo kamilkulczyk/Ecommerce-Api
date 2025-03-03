@@ -4,13 +4,8 @@ import (
   "context"
   "log"
   "os"
-  "time"
   "encoding/json"
-  "encoding/hex"
   "crypto/rand"
-  "net/http"
-  "net/url"
-  "errors"
   "fmt"
 
   "github.com/gofiber/fiber/v2"
@@ -59,12 +54,12 @@ func GetUserProductsAdded(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
-	rows, err := conn.Query(context.Background(), "
+	rows, err := conn.Query(context.Background(), `
 		SELECT p.id, p.name, p.price, p.price, p.stock, p.status_ide,
 				(SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.is_thumbnail DESC, pi.id ASC LIMIT 1) AS image
 		FROM products p
 		WHERE (p.user_id = $1)
-		", userId)
+		`, userId)
 	
 	if err != nil {
 		log.Println("Error fetching products:", err)
