@@ -9,6 +9,7 @@ import (
 func ProductRoutes(app *fiber.App) {
 	app.Get("/products", middlewares.OptionalJWTMiddleware(), handlers.GetProducts)
 	app.Post("/products", middlewares.JWTMiddleware(), handlers.CreateProduct)
+	app.Put("/products", middlewares.JWTMiddleware(), handlers.UpdateProduct)
 	app.Patch("/products/:id/status", middlewares.JWTMiddleware(), handlers.UpdateProductStatus)
 	app.Get("/product-statuses", handlers.GetProductStatuses)
 	app.Get("/products/:id", handlers.GetProductByID)

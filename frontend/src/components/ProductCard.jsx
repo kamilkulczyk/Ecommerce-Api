@@ -7,8 +7,7 @@ import "./ProductCard.css";
 
 const ProductCard = ({ 
   product, 
-  statuses, 
-  fetchProducts, 
+  statuses,
   showStatus = false, 
   allowStatusChange = false, 
   allowCartActions = true, 

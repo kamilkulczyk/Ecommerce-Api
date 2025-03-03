@@ -132,6 +132,97 @@ func CreateProduct(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Product created successfully", "product_id": productID})
 }
 
+func UpdateProduct(c *fiber.Ctx) error {
+	db := config.GetDB()
+	conn, err := db.Acquire(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to acquire DB connection:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Database connection error"})
+	}
+	defer conn.Release()
+
+	userID, ok := c.Locals("user_id").(int)
+	if !ok {
+		fmt.Println("ERROR: Failed to get user ID from context")
+		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	productID := c.Params("id")
+	if productID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "Product ID is required"})
+	}
+
+	var product models.Product
+	if err := c.BodyParser(&product); err != nil {
+		fmt.Println("ERROR: Invalid request body:", err)
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	var existingProductID int
+	err = conn.QueryRow(context.Background(),
+		"SELECT id FROM products WHERE id = $1 AND user_id = $2",
+		productID, userID,
+	).Scan(&existingProductID)
+
+	if err != nil {
+		fmt.Println("ERROR: Product not found or not owned by user:", err)
+		return c.Status(403).JSON(fiber.Map{"error": "Product not found or unauthorized"})
+	}
+
+	tx, err := conn.Begin(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to start transaction:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Transaction error"})
+	}
+	defer tx.Rollback(context.Background())
+
+	_, err = tx.Exec(context.Background(),
+		"UPDATE products SET name = $1, price = $2, stock = $3, status_id = 1 WHERE id = $4",
+		product.Name, product.Price, product.Stock, productID,
+	)
+	if err != nil {
+		fmt.Println("ERROR: Failed to update product:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update product"})
+	}
+
+	_, err = tx.Exec(context.Background(),
+		"UPDATE product_details SET description = $1, attributes = $2 WHERE product_id = $3",
+		product.Description, product.Attributes, productID,
+	)
+	if err != nil {
+		fmt.Println("ERROR: Failed to update product details:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update product details"})
+	}
+
+	_, err = tx.Exec(context.Background(),
+		"DELETE FROM product_images WHERE product_id = $1",
+		productID,
+	)
+	if err != nil {
+		fmt.Println("ERROR: Failed to delete old product images:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete old product images"})
+	}
+
+	for i, imgURL := range product.Images {
+		_, err = tx.Exec(context.Background(),
+			"INSERT INTO product_images (product_id, image_url, is_thumbnail) VALUES ($1, $2, $3)",
+			productID, imgURL, i == 0,
+		)
+		if err != nil {
+			fmt.Println("ERROR: Failed to insert product images:", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to insert product images"})
+		}
+	}
+
+	err = tx.Commit(context.Background())
+	if err != nil {
+		fmt.Println("ERROR: Failed to commit transaction:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Transaction commit failed"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Product updated successfully", "product_id": productID})
+}
+
 func UpdateProductStatus(c *fiber.Ctx) error {
 		db := config.GetDB()
 		conn, err := db.Acquire(context.Background())
