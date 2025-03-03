@@ -1,83 +1,163 @@
 .product-card {
-    width: 250px;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    text-align: center;
-  }
-  
-  .product-card img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-  
-  .product-title {
-    font-size: 1.1rem;
-    margin: 10px 0;
-  }
-  
-  .product-link {
-    color: #5a2ca0;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .product-price {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 5px 0;
-  }
-  
-  .product-stock {
-    font-size: 0.9rem;
-    color: #666;
-  }
-  
-  .product-status {
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 5px;
-  }
-  
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    margin: 10px 0;
-  }
-  
-  .quantity-btn {
-    background-color: #eee;
-    border: none;
-    padding: 5px 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .quantity-box {
-    width: 40px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px;
-  }
-  
-  .add-to-cart {
-    background-color: #5a2ca0;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .add-to-cart:disabled {
-    background-color: #ccc;
-  }
-  
+  width: 250px;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  text-align: center;
+}
+
+.product-card img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-title {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+.product-link {
+  color: #5a2ca0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.product-stock {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.product-status {
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 10px 0;
+}
+
+.quantity-btn {
+  background-color: #eee;
+  border: none;
+  padding: 5px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.quantity-box {
+  width: 40px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.add-to-cart {
+  background-color: #5a2ca0;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.add-to-cart:disabled {
+  background-color: #ccc;
+}
+
+/* Compact View Styles */
+.products-container.compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.product-card.compact {
+  width: 100px;
+  padding: 5px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.product-card.compact img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.product-card.compact .product-title,
+.product-card.compact .product-stock {
+  display: none;
+}
+
+.product-card.compact .product-price {
+  font-size: 14px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 20px;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4CAF50;
+}
+
+input:checked + .slider::before {
+  transform: translateX(14px);
+}

@@ -9,6 +9,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(2);
+  const [isCompact, setIsCompact] = useState(false);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -69,16 +70,26 @@ const Products = () => {
         </div>
       )}
 
-      <div className="products-container">
+      <div className="toggle-container">
+        <label className="switch">
+          <input type="checkbox" checked={isCompact} onChange={() => setIsCompact(!isCompact)} />
+          <span className="slider"></span>
+        </label>
+        <span>{isCompact ? "Compact View" : "Default View"}</span>
+      </div>
+
+      <div className={`products-container ${isCompact ? "compact" : ""}`}>
         {products.length > 0 ? (
           products.map((product) => (
             <ProductCard 
+              key={product.id}
               product={product} 
               statuses={statuses} 
               showStatus={false} 
               allowStatusChange={user?.is_admin} 
               allowCartActions={true} 
               showEditButton={false} 
+              isCompact={isCompact}
             />
           ))
         ) : (

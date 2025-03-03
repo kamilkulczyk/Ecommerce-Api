@@ -11,7 +11,8 @@ const ProductCard = ({
   showStatus = false, 
   allowStatusChange = false, 
   allowCartActions = true, 
-  showEditButton = false 
+  showEditButton = false,
+  isCompact = false
 }) => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -21,25 +22,36 @@ const ProductCard = ({
   };
 
   return (
-    <div className="product-card">
+    <div className={`product-card ${isCompact ? "compact" : ""}`}>
+    {isCompact ? (
+      <Link to={`/products/${product.id}`}>
+        <img src={product.images?.[0] || "placeholder.jpg"} alt={product.name} />
+      </Link>
+    ) : (
       <img src={product.images?.[0] || "placeholder.jpg"} alt={product.name} />
+    )}
+
+    {!isCompact && (
       <h3 className="product-title">
         <Link to={`/products/${product.id}`} className="product-link">
           {product.name}
         </Link>
       </h3>
-      <p className="product-price">💰 ${product.price}</p>
-      <p className="product-stock">📦 In Stock: {product.stock}</p>
+    )}
 
-      {showStatus && <ProductStatus product={product} statuses={statuses} allowChange={allowStatusChange} />}
-      {allowCartActions && <ProductQuantity product={product} />}
+    <p className="product-price">💰 ${product.price}</p>
 
-      {showEditButton && (
-        <button className="edit-button" onClick={handleEdit}>
-          ✏️ Edit Product
-        </button>
-      )}
-    </div>
+    {!isCompact && <p className="product-stock">📦 In Stock: {product.stock}</p>}
+
+    {showStatus && <ProductStatus product={product} statuses={statuses} allowChange={allowStatusChange} />}
+    {allowCartActions && <ProductQuantity product={product} />}
+
+    {showEditButton && (
+      <button className="edit-button" onClick={handleEdit}>
+        ✏️ Edit Product
+      </button>
+    )}
+  </div>
   );
 };
 

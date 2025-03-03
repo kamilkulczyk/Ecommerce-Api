@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Profile = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
-  const [statuses, setStatuses] = useState(null);
+  const [statuses, setStatuses] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
