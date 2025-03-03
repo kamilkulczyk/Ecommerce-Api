@@ -75,7 +75,6 @@ const Products = () => {
             <ProductCard 
               product={product} 
               statuses={statuses} 
-              fetchProducts={fetchProducts} 
               showStatus={false} 
               allowStatusChange={user?.is_admin} 
               allowCartActions={true} 

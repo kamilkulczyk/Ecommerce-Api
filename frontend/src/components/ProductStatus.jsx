@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const ProductStatus = ({ product, statuses, allowChange, fetchProducts }) => {
+const ProductStatus = ({ product, statuses, allowChange }) => {
   const [selectedStatus, setSelectedStatus] = useState(product.status_id);
 
   const handleStatusChange = async (newStatusId) => {
@@ -12,7 +12,6 @@ const ProductStatus = ({ product, statuses, allowChange, fetchProducts }) => {
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       setSelectedStatus(newStatusId);
-      fetchProducts();
     } catch (error) {
       console.error("Failed to update status:", error);
     }

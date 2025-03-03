@@ -32,7 +32,7 @@ const ProductCard = ({
       <p className="product-price">💰 ${product.price}</p>
       <p className="product-stock">📦 In Stock: {product.stock}</p>
 
-      {showStatus && <ProductStatus product={product} statuses={statuses} allowChange={allowStatusChange} fetchProducts={fetchProducts} />}
+      {showStatus && <ProductStatus product={product} statuses={statuses} allowChange={allowStatusChange} />}
       {allowCartActions && <ProductQuantity product={product} />}
 
       {showEditButton && (
