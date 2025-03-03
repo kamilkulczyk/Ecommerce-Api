@@ -8,8 +8,12 @@ const Products = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(2);
-  const [isCompact, setIsCompact] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(() => {
+    return localStorage.getItem("selectedStatus") || 2;
+  });
+  const [isCompact, setIsCompact] = useState(() => {
+    return localStorage.getItem("isCompact") === "true";
+  });
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -48,7 +52,15 @@ const Products = () => {
   }, [selectedStatus, user?.is_admin]);
 
   const handleStatusChange = (e) => {
-    setSelectedStatus(Number(e.target.value));
+    const newStatus = Number(e.target.value);
+    setSelectedStatus(newStatus);
+    localStorage.setItem("selectedStatus", newStatus);
+  };
+
+  const toggleCompactView = () => {
+    const newCompactState = !isCompact;
+    setIsCompact(newCompactState);
+    localStorage.setItem("isCompact", newCompactState);
   };
 
   if (!statuses) return <p>Loading statuses...</p>;
@@ -70,19 +82,16 @@ const Products = () => {
         </div>
       )}
 
-      <div className="toggle-container">
-        <label className="switch">
-          <input type="checkbox" checked={isCompact} onChange={() => setIsCompact(!isCompact)} />
-          <span className="slider"></span>
-        </label>
-        <span>{isCompact ? "Compact View" : "Default View"}</span>
-      </div>
+      <label className="compact-toggle">
+        <input type="checkbox" checked={isCompact} onChange={toggleCompactView} />
+        Compact View
+      </label>
 
-      <div className={`products-container ${isCompact ? "compact" : ""}`}>
+      <div className={`products-container ${isCompact ? "compact-grid" : ""}`}>
         {products.length > 0 ? (
           products.map((product) => (
             <ProductCard 
-              key={product.id}
+              key={product.id} 
               product={product} 
               statuses={statuses} 
               showStatus={false} 

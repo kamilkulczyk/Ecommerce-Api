@@ -14,6 +14,12 @@
   border-radius: 8px;
 }
 
+.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+}
+
 .product-title {
   font-size: 1.1rem;
   margin: 10px 0;
