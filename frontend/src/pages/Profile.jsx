@@ -27,7 +27,7 @@ const Profile = () => {
         : {};
       const url = `${import.meta.env.VITE_API_URL}/user-added-products`;
       const res = await axios.get(url, {
-        params: user?.id,
+        params: { user_id: user?.id },
         headers,
         withCredentials: true,
       });
@@ -40,7 +40,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchProducts();
-  });
+  }, [user]);
 
   return (
     <div className="profile-container">
