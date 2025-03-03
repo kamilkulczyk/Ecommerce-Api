@@ -7,9 +7,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const existingProduct = location.state?.product;
 
-  const [product, setProduct] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
@@ -21,12 +19,12 @@ const AddProduct = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`);
-        setProduct(response.data);
+        const product = response.data;
         setName(product.name);
         setPrice(product.price);
         setStock(product.stock);
         setDescription(product.description);
-        setImageUrls(product.images?.length ? existingProduct.images : [""]);
+        setImageUrls(product.images?.length ? product.images : [""]);
       } catch (error) {
         console.error("Error fetching product:", error);
       } finally {
