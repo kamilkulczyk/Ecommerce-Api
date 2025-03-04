@@ -18,7 +18,7 @@ const ProductQuantity = ({ product, showCartButton = true }) => {
         <button className="quantity-btn" onClick={() => handleQuantityChange(quantity - 1)} disabled={quantity === 1}>
           -
         </button>
-        <span className="quantity-value">{quantity}</span>
+        <span className="quantity-box">{quantity}</span>
         <button className="quantity-btn" onClick={() => handleQuantityChange(quantity + 1)} disabled={quantity >= maxAvailable}>
           +
         </button>
