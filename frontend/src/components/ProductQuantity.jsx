@@ -23,7 +23,7 @@ const ProductQuantity = ({ product }) => {
           +
         </button>
         <button className="cart-btn" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
-          Add to Cart
+          🛒
         </button>
       </div>
     </>

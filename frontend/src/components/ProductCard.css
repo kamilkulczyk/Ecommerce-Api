@@ -87,23 +87,23 @@
   background-color: #ccc;
 }
 
-/* Compact View Grid */
+/* Compact View Grid - Wider Cards */
 .products-container.compact {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 8px;
 }
 
 .product-card.compact {
-  width: 100px;
+  width: 130px;
   padding: 5px;
   text-align: center;
   font-size: 12px;
 }
 
 .product-card.compact img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .product-card.compact .quantity-box {
-  width: 25px;
+  width: 30px;
   text-align: center;
   border: 1px solid #ddd;
   border-radius: 4px;
