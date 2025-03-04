@@ -53,6 +53,11 @@
   cursor: default;
 }
 
+.quantity-btn:disabled {
+  background: rgb(153, 153, 153);
+  cursor: default;
+}
+
 .product-card.compact {
   width: 130px;
   padding: 8px;
@@ -84,7 +89,7 @@
 }
 
 .product-card.compact .quantity-btn {
-  background-color: #eee;
+  background-color: rgb(119, 126, 190);
   border: none;
   padding: 5px;
   font-size: 12px;
@@ -110,5 +115,9 @@
 }
 
 .product-card.compact .cart-btn:disabled {
-  color: #ccc;
+  color: #0000005c;
+}
+
+.product-card.compact .quantity-btn:disabled {
+  background: rgb(153, 153, 153);
 }
