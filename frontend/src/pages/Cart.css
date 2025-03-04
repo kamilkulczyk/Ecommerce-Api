@@ -55,30 +55,6 @@
     gap: 5px;
 }
 
-.quantity-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.quantity-btn:hover {
-    background: #0056b3;
-}
-
-.quantity-input {
-    width: 35px;
-    text-align: center;
-    font-size: 14px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
 .cart-item-total {
     font-size: 16px;
     font-weight: bold;

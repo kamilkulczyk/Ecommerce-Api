@@ -2,10 +2,11 @@ import { CartContext } from "../context/CartContext";
 import { useContext } from "react";
 import { FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import ProductQuantity from "./ProductQuantity";
 import "./Cart.css";
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart } = useContext(CartContext);
+  const { cart, removeFromCart, clearCart } = useContext(CartContext);
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
@@ -32,23 +33,7 @@ const Cart = () => {
               <div className="cart-item-right">
                 <p className="cart-item-price">{item.price.toFixed(2)} zł</p>
 
-                <div className="cart-controls">
-                  <button
-                    className="quantity-btn"
-                    disabled={item.quantity <= 1}
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  >
-                    −
-                  </button>
-                  <input type="text" value={item.quantity} readOnly className="quantity-input" />
-                  <button
-                    className="quantity-btn"
-                    disabled={item.quantity >= item.stock}
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  >
-                    +
-                  </button>
-                </div>
+                <ProductQuantity product={item} showCartButton={false} />
 
                 <p className="cart-item-total">{(item.price * item.quantity).toFixed(2)} zł</p>
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import "./ProductCard.css";
 
-const ProductQuantity = ({ product }) => {
+const ProductQuantity = ({ product, showCartButton = true }) => {
   const { cart, addToCart } = useCart();
   const cartItem = cart.find((item) => item.id === product.id);
   const maxAvailable = product.stock - (cartItem ? cartItem.quantity : 0);
@@ -22,9 +22,11 @@ const ProductQuantity = ({ product }) => {
         <button className="quantity-btn" onClick={() => handleQuantityChange(quantity + 1)} disabled={quantity >= maxAvailable}>
           +
         </button>
-        <button className="cart-btn" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
-          🛒
-        </button>
+        {showCartButton && (
+          <button className="cart-btn" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
+            🛒
+          </button>
+        )}
       </div>
     </>
   );
