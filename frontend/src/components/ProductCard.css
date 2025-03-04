@@ -51,70 +51,81 @@
 .quantity-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
+  justify-content: space-between;
+  gap: 10px;
   margin: 10px 0;
 }
 
 .quantity-btn {
   background-color: #eee;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 12px;
   font-size: 1rem;
   cursor: pointer;
   border-radius: 5px;
 }
 
 .quantity-box {
-  width: 40px;
+  width: 50px;
+  font-size: 1.1rem;
   text-align: center;
   border: 1px solid #ddd;
   border-radius: 5px;
-  padding: 5px;
+  padding: 6px;
 }
 
 .cart-btn {
-  background-color: #00000000;
-  color: white;
+  background-color: transparent;
+  color: #5a2ca0;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
+  font-size: 1.5rem;
   cursor: pointer;
-  width: 100%;
+  padding: 8px;
 }
 
 .cart-btn:disabled {
-  background-color: #ccc;
+  color: #ccc;
 }
 
-.products-container.compact {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
+.product-card.compact .quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 5px;
 }
 
-.product-card.compact {
-  width: 130px;
+.product-card.compact .quantity-btn {
+  background-color: #eee;
+  border: none;
   padding: 5px;
-  text-align: center;
   font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-.product-card.compact img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+.product-card.compact .quantity-box {
+  width: 30px;
+  font-size: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 3px;
 }
 
-.product-card.compact .product-title,
-.product-card.compact .product-stock {
-  display: none;
+.product-card.compact .cart-btn {
+  background-color: transparent;
+  color: #5a2ca0;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
 }
 
-.product-card.compact .product-price {
-  font-size: 14px;
-  margin-bottom: 5px;
+.product-card.compact .cart-btn:disabled {
+  color: #ccc;
 }
+
 
 .toggle-container {
   display: flex;
