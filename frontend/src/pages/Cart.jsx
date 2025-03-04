@@ -2,7 +2,7 @@ import { CartContext } from "../context/CartContext";
 import { useContext } from "react";
 import { FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import ProductQuantity from "./ProductQuantity";
+import ProductQuantity from "../components/ProductQuantity";
 import "./Cart.css";
 
 const Cart = () => {
