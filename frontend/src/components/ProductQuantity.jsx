@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
+import "./ProductCard.css";
 
 const ProductQuantity = ({ product }) => {
   const { cart, addToCart } = useCart();
@@ -21,11 +22,10 @@ const ProductQuantity = ({ product }) => {
         <button className="quantity-btn" onClick={() => handleQuantityChange(quantity + 1)} disabled={quantity >= maxAvailable}>
           +
         </button>
+        <button className="cart-btn" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
+          Add to Cart
+        </button>
       </div>
-
-      <button className="add-to-cart" onClick={() => addToCart(product, quantity)} disabled={maxAvailable === 0}>
-        Add to Cart
-      </button>
     </>
   );
 };

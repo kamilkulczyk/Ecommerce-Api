@@ -9,7 +9,7 @@ const Profile = () => {
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const navigate = useNavigate();
-  
+
   const [isCompact, setIsCompact] = useState(() => {
     return localStorage.getItem("isCompact") === "true";
   });
@@ -84,7 +84,8 @@ const Profile = () => {
                   showStatus={true} 
                   allowStatusChange={user?.is_admin} 
                   allowCartActions={false} 
-                  showEditButton={true} 
+                  showEditButton={true}
+                  isCompact={isCompact}
                 />
               ))
             ) : (
