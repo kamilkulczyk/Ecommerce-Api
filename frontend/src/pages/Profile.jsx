@@ -9,6 +9,10 @@ const Profile = () => {
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const navigate = useNavigate();
+  
+  const [isCompact, setIsCompact] = useState(() => {
+    return localStorage.getItem("isCompact") === "true";
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -50,6 +54,12 @@ const Profile = () => {
     fetchProducts();
   }, [user]);
 
+  const toggleCompactView = () => {
+    const newCompactState = !isCompact;
+    setIsCompact(newCompactState);
+    localStorage.setItem("isCompact", newCompactState);
+  };
+
   return (
     <div className="profile-container">
       <h2>User Profile</h2>
@@ -58,6 +68,12 @@ const Profile = () => {
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <h2>Your products</h2>
+
+          <label className="compact-toggle">
+            <input type="checkbox" checked={isCompact} onChange={toggleCompactView} />
+            Compact View
+          </label>
+
           <div className="products-container">
             {products?.length > 0 ? (
               products.map((product) => (
