@@ -96,7 +96,7 @@ const Products = () => {
               key={product.id} 
               product={product} 
               statuses={statuses} 
-              showStatus={true} 
+              showStatus={false} 
               allowStatusChange={user?.is_admin} 
               allowCartActions={true} 
               showEditButton={false} 
