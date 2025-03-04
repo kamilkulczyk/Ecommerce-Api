@@ -14,6 +14,45 @@
   border-radius: 8px;
 }
 
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.quantity-btn {
+  background-color: rgb(119, 126, 190);
+  border: none;
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.quantity-box {
+  width: 30px;
+  font-size: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.cart-btn {
+  background-color: transparent;
+  border: none;
+  font-size: larger;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.cart-btn:disabled {
+  color: #0000005c;
+  cursor: default;
+}
+
 .product-card.compact {
   width: 130px;
   padding: 8px;
@@ -64,7 +103,6 @@
 
 .product-card.compact .cart-btn {
   background-color: transparent;
-  color: #5a2ca0;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
