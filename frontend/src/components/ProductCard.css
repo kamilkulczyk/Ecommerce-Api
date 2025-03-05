@@ -18,8 +18,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  margin-top: 5px;
+  gap: 8px;
+  margin: 0 10px;
 }
 
 .product-link {
@@ -29,10 +29,12 @@
 .quantity-btn {
   background-color: rgb(119, 126, 190);
   border: none;
-  padding: 5px;
+  padding: 6px 8px;
   font-size: 12px;
   cursor: pointer;
   border-radius: 4px;
+  min-width: 27px;
+  text-align: center;
 }
 
 .quantity-box {
