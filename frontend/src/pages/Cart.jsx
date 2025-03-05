@@ -31,11 +31,11 @@ const Cart = () => {
               </div>
 
               <div className="cart-item-right">
-                <p className="cart-item-price">{item.price.toFixed(2)} zł</p>
+                <p className="cart-item-price">${item.price.toFixed(2)}</p>
 
                 <ProductQuantity product={item} showCartButton={false} />
 
-                <p className="cart-item-total">{(item.price * item.quantity).toFixed(2)} zł</p>
+                <p className="cart-item-total">${(item.price * item.quantity).toFixed(2)}</p>
 
                 <button className="remove-button" onClick={() => removeFromCart(item.id)}>
                   <FaTrash />
@@ -45,7 +45,7 @@ const Cart = () => {
           ))}
 
           <div className="cart-total">
-            <strong>Total: {calculateTotal()} zł</strong>
+            <strong>Total: ${calculateTotal()}</strong>
           </div>
 
           <button className="clear-cart-btn" onClick={clearCart}>Clear Cart</button>
