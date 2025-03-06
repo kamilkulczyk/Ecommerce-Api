@@ -1,14 +1,17 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
+import Notifications from "../components/Notifications";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import "./Profile.css"
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("products")
 
   const [isCompact, setIsCompact] = useState(() => {
     return localStorage.getItem("isCompact") === "true";
@@ -67,31 +70,56 @@ const Profile = () => {
         <div>
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
-          <h2>Your products</h2>
 
-          <label className="compact-toggle">
-            <input type="checkbox" checked={isCompact} onChange={toggleCompactView} />
-            Compact View
-          </label>
-
-          <div className="products-container">
-            {products?.length > 0 ? (
-              products.map((product) => (
-                <ProductCard 
-                  product={product} 
-                  statuses={statuses} 
-                  fetchProducts={fetchProducts} 
-                  showStatus={true} 
-                  allowStatusChange={user?.is_admin} 
-                  allowCartActions={false} 
-                  showEditButton={true}
-                  isCompact={isCompact}
-                />
-              ))
-            ) : (
-              <p>No products available</p>
-            )}
+          <div className="profile-tabs">
+            <button
+              onClick={() => setActiveTab("products")}
+              className={activeTab === "products" ? "active" : ""}
+            >
+              Your products
+            </button>
+            <button
+              onClick={() => setActiveTab("notifications")}
+              className={activeTab === "notifications" ? "active" : ""}
+            >
+              <h2>Notifications</h2>
+            </button>
           </div>
+          
+          {activeTab === "products" && (
+            <div>
+              <h2>Your products</h2>
+              <label className="compact-toggle">
+                <input type="checkbox" checked={isCompact} onChange={toggleCompactView} />
+                Compact View
+              </label>
+    
+              <div className="products-container">
+                {products?.length > 0 ? (
+                  products.map((product) => (
+                    <ProductCard 
+                      product={product} 
+                      statuses={statuses} 
+                      fetchProducts={fetchProducts} 
+                      showStatus={true} 
+                      allowStatusChange={user?.is_admin} 
+                      allowCartActions={false} 
+                      showEditButton={true}
+                      isCompact={isCompact}
+                    />
+                  ))
+                ) : (
+                  <p>No products available</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "notifications" && (
+            <div>
+              <Notifications />
+            </div>
+          )}
         </div>
       )}
     </div>
