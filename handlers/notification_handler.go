@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/kamilkulczyk/Ecommerce-Api/config"
 )
 
@@ -17,14 +16,13 @@ func CreateNotification(userID int, message string) error {
 	}
 	defer conn.Release()
 
-    _, err := conn.Exec(context.Background(), `
+    if _, err := conn.Exec(context.Background(), `
         INSERT INTO notifications (user_id, message) 
         VALUES ($1, $2)
-    `, userID, message)
-	if err != nil {
+    `, userID, message); err != nil {
         log.Println("Failed to insert notification:", err)
-        return
+        return err
     }
-	
+
     return err
 }

@@ -112,17 +112,11 @@ func MarkNotificationRead(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-    id, ok := c.Params("id")
-	if !ok {
-		fmt.Println("ERROR: Failed to get notification ID from context")
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
-	}
+    id := c.Params("id")
 
-    _, err := conn.Exec(context.Background(), `
+    if _, err := conn.Exec(context.Background(), `
         UPDATE notifications SET is_read = TRUE WHERE id = $1
-    `, id)
-
-    if err != nil {
+    `, id); err != nil {
         return c.Status(500).JSON(fiber.Map{"error": "Failed to update notification"})
     }
     return c.SendStatus(200)
@@ -137,17 +131,11 @@ func DeleteNotification(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-    id, ok := c.Params("id")
-	if !ok {
-		fmt.Println("ERROR: Failed to get notification ID from context")
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
-	}
+    id := c.Params("id")
 
-    _, err := conn.Exec(context.Background(), `
+    if _, err := conn.Exec(context.Background(), `
         DELETE FROM notifications WHERE id = $1
-    `, id)
-
-    if err != nil {
+    `, id); err != nil {
         return c.Status(500).JSON(fiber.Map{"error": "Failed to delete notification"})
     }
     return c.SendStatus(200)
