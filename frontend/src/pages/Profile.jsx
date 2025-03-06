@@ -82,7 +82,7 @@ const Profile = () => {
               onClick={() => setActiveTab("notifications")}
               className={activeTab === "notifications" ? "active" : ""}
             >
-              <h2>Notifications</h2>
+              Notifications
             </button>
           </div>
           

@@ -1,15 +1,24 @@
 .profile-tabs {
-    display: flex;
-    margin-bottom: 20px;
-  }
-  
-  .profile-tabs button {
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-  }
-  
-  .profile-tabs button.active {
-    background-color: #e0e0e0;
-  }
+  display: inline-flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.profile-tabs button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-radius: 5px 5px 0 0;
+  margin-right: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.profile-tabs button.active {
+  background-color: #e0e0e0;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.profile-tabs button:hover {
+  background-color: #e8e8e8;
+}
