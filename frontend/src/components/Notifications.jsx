@@ -10,7 +10,7 @@ const Notifications = () => {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/notifications`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
-        setNotifications(res.data);
+        setNotifications(res.data || []);
       } catch (error) {
         console.error("Failed to fetch notifications", error);
       }
