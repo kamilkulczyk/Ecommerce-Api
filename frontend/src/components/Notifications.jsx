@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "./Notifications.css"
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -36,14 +37,23 @@ const Notifications = () => {
   return (
     <div>
       <h3>Notifications</h3>
-      {notifications.length === 0 ? <p>No notifications</p> : (
-        notifications.map(n => (
-          <div key={n.id} style={{ padding: "10px", borderBottom: "1px solid gray" }}>
-            <p>{n.message}</p>
-            {!n.is_read && <button onClick={() => markAsRead(n.id)}>Mark as Read</button>}
-            <button onClick={() => deleteNotification(n.id)}>Delete</button>
-          </div>
-        ))
+      {notifications.length === 0 ? (
+        <p>No notifications</p>
+      ) : (
+        <div className="notifications-container">
+          {notifications.map(n => (
+            <div 
+              key={n.id} 
+              className={`notification ${n.is_read ? 'read' : 'unread'}`} 
+              onClick={() => markAsRead(n.id)}
+            >
+              <p>{n.message}</p>
+              <button onClick={(e) => { e.stopPropagation(); deleteNotification(n.id)}}> 
+                Delete 
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

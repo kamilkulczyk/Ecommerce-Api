@@ -1,0 +1,38 @@
+.notifications-container {
+    margin-top: 20px; 
+  }
+  
+  .notification {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .notification.unread {
+    font-weight: bold;
+  }
+  
+  .notification.read {
+    font-weight: normal;
+    background-color: #e8e8e8;
+  }
+  
+  .notification:hover {
+    background-color: #f4f4f4;
+  }
+  
+  .notification button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
