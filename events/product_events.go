@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kamilkulczyk/Ecommerce-Api/config"
-	"github.com/kamilkulczyk/Ecommerce-Api/models"
+	"github.com/kamilkulczyk/Ecommerce-Api/handlers"
 )
 
 // Notification structure
