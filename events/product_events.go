@@ -49,7 +49,7 @@ func ListenForProductNotifications() {
 
 		// Create notification for user
 		message := "Your product '" + event.ProductName + "' has been added successfully!"
-		if err := CreateNotification(event.UserID, message); err != nil {
+		if err := handlers.CreateNotification(event.UserID, message); err != nil {
 			log.Println("Failed to create notification:", err)
 		}
 	}
